@@ -1,0 +1,9 @@
+[submodule "plog"]
+	path = plog
+	url = https://github.com/SergiusTheBest/plog.git
+[submodule "yaml-cpp"]
+	path = yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp.git
+[submodule "libuv"]
+	path = libuv
+	url = https://github.com/libuv/libuv.git
