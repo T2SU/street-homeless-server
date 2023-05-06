@@ -6,10 +6,10 @@ template<int BufferSize, int InitPoolSize, typename Alloc = std::allocator<std::
 class memory_pool
 {
 public:
-    struct memory_block
+    typedef struct
     {
         Alloc::value_type buffer[BufferSize];
-    };
+    } memory_block;
 
 private:
     typedef std::allocator_traits<Alloc>::template rebind_alloc<memory_block> MemoryBlockAlloc;

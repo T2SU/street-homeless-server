@@ -15,6 +15,7 @@
 #include <thread>
 #include <format>
 #include <memory>
+#include <array>
 #include <exception>
 #include <unordered_set>
 #include <unordered_map>

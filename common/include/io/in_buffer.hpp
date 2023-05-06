@@ -17,10 +17,19 @@ private:
     size_t _virtual_size;
 
 public:
+
     basic_in_buffer()
         : _buffer()
         , _offset(0)
         , _virtual_size(0) {}
+
+    basic_in_buffer(const void* buffer, size_t len)
+        : _buffer()
+        , _offset(0)
+        , _virtual_size(0)
+    {
+        append_buffer(buffer, len);
+    }
 
     basic_in_buffer& operator= (const basic_in_buffer&) = delete;
     basic_in_buffer& operator= (basic_in_buffer&&) = delete;
@@ -97,6 +106,7 @@ class in_buffer : basic_in_buffer<std::byte>
 {
 public:
     in_buffer() : basic_in_buffer() {}
+    in_buffer(const void *buffer, size_t len) : basic_in_buffer(buffer, len) {}
 };
 
 #endif //STREET_HOMELESS_SERVER_IN_BUFFER_HPP
