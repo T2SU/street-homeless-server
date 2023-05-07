@@ -5,58 +5,54 @@
 #include "std_common.hpp"
 #include "thread/socket_thread.hpp"
 #include "net/abstract_session.hpp"
-#include "io/in_buffer.hpp"
 
-socket_thread::socket_thread(uint32_t id)
+homeless::socket_thread::socket_thread(uint32_t id)
     : _id(id)
     , _cv()
     , _mutex()
     , _alive(true)
-    , _jobs()
+    , _queued_sessions()
 {
     LOGD << "Constructed socket thread - " << _id;
 }
 
-socket_thread::~socket_thread()
+homeless::socket_thread::~socket_thread()
 {
     LOGD << "Destructed socket thread - " << _id;
 }
 
-void socket_thread::run(socket_thread *$this)
+void homeless::socket_thread::run(socket_thread *$this)
 {
     while ($this->_alive)
     {
-        while (true)
+        abstract_session* session;
+        synchronized ($this->_mutex)
         {
-            socket_job* job;
-            synchronized ($this->_mutex)
-            {
-                if (!$this->_jobs.empty())
-                    job = &$this->_jobs.front();
-                else
-                    job = nullptr;
-            }
-            if (job == nullptr)
+            $this->_cv.wait(_ul, [$this]{ return !$this->_queued_sessions.empty() || !$this->_alive; });
+            if ($this->_alive && $this->_queued_sessions.empty())
                 break;
-            job->socket->on_packet(*(job->packet));
-            $this->_jobs.pop_front();
+            session = $this->_queued_sessions.front();
+            $this->_queued_sessions.pop_front();
+            LOGV << "socket " << session->get_id() << " was dequeued from socket thread - " << $this->_id;
         }
-        std::unique_lock<decltype($this->_mutex)> ul($this->_mutex);
-        $this->_cv.wait(ul);
+        session->do_socket_op();
     }
+    LOGD << "socket thread - " << $this->_id << " has finished.";
 }
 
-void socket_thread::enqueue(socket_thread::socket_job job)
+void homeless::socket_thread::enqueue(abstract_session* session)
 {
     synchronized (_mutex)
     {
-        _jobs.emplace_back(job);
-        _cv.notify_one();
+        _queued_sessions.push_back(session);
+        LOGV << "socket " << session->get_id() << " was enqueued to socket thread - " << _id;
     }
+    _cv.notify_one();
 }
 
-void socket_thread::stop()
+void homeless::socket_thread::stop()
 {
     _alive = false;
+    _cv.notify_all();
     LOGD << "Requested stopping socket thread - " << _id;
 }

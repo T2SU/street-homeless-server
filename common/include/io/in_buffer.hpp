@@ -80,7 +80,7 @@ public:
     [[nodiscard]]
     std::string dump_packet() const
     {
-        return net_tools::dump_memory(get_raw_buffer(), get_virtual_size());
+        return homeless::net_tools::dump_memory(get_raw_buffer(), get_virtual_size());
     }
 
     [[nodiscard]]
@@ -102,7 +102,7 @@ public:
     }
 };
 
-class in_buffer : basic_in_buffer<std::byte>
+class in_buffer : public basic_in_buffer<std::byte>
 {
 public:
     in_buffer() : basic_in_buffer() {}

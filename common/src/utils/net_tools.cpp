@@ -5,7 +5,7 @@
 #include "std_common.hpp"
 #include "utils/net_tools.hpp"
 
-std::string net_tools::dump_memory(const void *buffer, size_t len)
+std::string homeless::net_tools::dump_memory(const void *buffer, size_t len)
 {
     const char*         buf = reinterpret_cast<const char*>(buffer);
     std::stringstream   ss;

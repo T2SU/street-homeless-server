@@ -5,24 +5,21 @@
 #include "std_common.hpp"
 #include "net/abstract_server.hpp"
 
-template<SessionType SessTy, AcceptorType<SessTy> AcceptTy>
-abstract_server<SessTy, AcceptTy>::abstract_server(uv_loop_t* loop, std::string bind_address, uint16_t bind_port, uint32_t threads)
+template<homeless::SessionType SessTy, homeless::AcceptorType<SessTy> AcceptTy>
+homeless::abstract_server<SessTy, AcceptTy>::abstract_server(uv_loop_t* loop, std::string bind_address, uint16_t bind_port)
         : _sessions()
         , _acceptor(loop, std::move(bind_address), bind_port)
         , _session_pool()
         , _mutex()
         , _allocator()
-        , _threads()
 {
     _sessions = _allocator.allocate(MaxSession);
     for (auto i = 0u; i < MaxSession; ++i)
         _session_pool.push(i);
-    for (auto i = 0u; i < threads; ++i)
-        _threads.emplace_back(std::make_shared<socket_thread>(i));
 }
 
-template<SessionType SessTy, AcceptorType<SessTy> AcceptTy>
-abstract_server<SessTy, AcceptTy>::~abstract_server()
+template<homeless::SessionType SessTy, homeless::AcceptorType<SessTy> AcceptTy>
+homeless::abstract_server<SessTy, AcceptTy>::~abstract_server()
 {
     if (_session_pool.size() != MaxSession)
     {
@@ -31,8 +28,8 @@ abstract_server<SessTy, AcceptTy>::~abstract_server()
     _allocator.deallocate(_sessions, MaxSession);
 }
 
-template<SessionType SessTy, AcceptorType<SessTy> AcceptTy>
-size_t abstract_server<SessTy, AcceptTy>::get_connections() const
+template<homeless::SessionType SessTy, homeless::AcceptorType<SessTy> AcceptTy>
+size_t homeless::abstract_server<SessTy, AcceptTy>::get_connections() const
 {
     synchronized (_mutex)
     {
@@ -40,8 +37,8 @@ size_t abstract_server<SessTy, AcceptTy>::get_connections() const
     }
 }
 
-template<SessionType SessTy, AcceptorType<SessTy> AcceptTy>
-SessTy *abstract_server<SessTy, AcceptTy>::acquire_session()
+template<homeless::SessionType SessTy, homeless::AcceptorType<SessTy> AcceptTy>
+SessTy *homeless::abstract_server<SessTy, AcceptTy>::acquire_session()
 {
     synchronized (_mutex)
     {
@@ -56,8 +53,8 @@ SessTy *abstract_server<SessTy, AcceptTy>::acquire_session()
     }
 }
 
-template<SessionType SessTy, AcceptorType<SessTy> AcceptTy>
-void abstract_server<SessTy, AcceptTy>::release_session(SessTy *session)
+template<homeless::SessionType SessTy, homeless::AcceptorType<SessTy> AcceptTy>
+void homeless::abstract_server<SessTy, AcceptTy>::release_session(SessTy *session)
 {
     synchronized (_mutex)
     {
@@ -65,25 +62,4 @@ void abstract_server<SessTy, AcceptTy>::release_session(SessTy *session)
         _session_pool.push(session->get_id());
         LOGV << "released a login session - " << session->get_id();
     }
-}
-
-template<SessionType SessTy, AcceptorType<SessTy> AcceptTy>
-void abstract_server<SessTy, AcceptTy>::begin()
-{
-    for (const auto& thread_ptr : _threads)
-    {
-        std::thread th(thread_ptr.get());
-        th.detach();
-    }
-    LOGD << "Started " << _threads.size() << " socket threads";
-}
-
-template<SessionType SessTy, AcceptorType<SessTy> AcceptTy>
-void abstract_server<SessTy, AcceptTy>::end()
-{
-    for (const auto& thread_ptr : _threads)
-    {
-        thread_ptr.get()->stop();
-    }
-    LOGD << "Requested stopping " << _threads.size() << " socket threads";
 }

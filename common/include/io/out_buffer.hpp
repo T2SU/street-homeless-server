@@ -54,11 +54,11 @@ public:
     [[nodiscard]]
     std::string dump_packet() const
     {
-        return net_tools::dump_memory(get_buffer(), get_buffer_size());
+        return homeless::net_tools::dump_memory(get_buffer(), get_buffer_size());
     }
 };
 
-class out_buffer : basic_out_buffer<std::byte>
+class out_buffer : public basic_out_buffer<std::byte>
 {
 public:
     out_buffer() = default;
