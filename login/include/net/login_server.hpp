@@ -6,25 +6,18 @@
 #define STREET_HOMELESS_SERVER_LOGIN_SERVER_HPP
 
 #include "login_session.hpp"
-#include "login_acceptor.hpp"
+#include <net/abstract_server.hpp>
 
-class login_server
+namespace hl::login
 {
-private:
-    login_session* _sessions;
-    login_acceptor _acceptor;
-    std::queue<size_t> _session_pool;
-    mutable std::mutex _mutex;
-    std::allocator<login_session> _allocator;
+    class login_server : public abstract_server<login_session>
+    {
+    public:
+        login_server()
+            : abstract_server() {}
 
-public:
-    login_server(uv_loop_t* loop, std::string bind_address, uint16_t bind_port);
-    virtual ~login_server();
-
-    size_t get_connections() const;
-    login_session* acquire_session();
-    void release_session(login_session* session);
-};
-
+        void on_accept(login_session* session) override;
+    };
+}
 
 #endif //STREET_HOMELESS_SERVER_LOGIN_SERVER_HPP

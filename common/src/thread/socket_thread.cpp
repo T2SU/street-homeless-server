@@ -6,7 +6,7 @@
 #include "thread/socket_thread.hpp"
 #include "net/abstract_session.hpp"
 
-homeless::socket_thread::socket_thread(uint32_t id)
+hl::socket_thread::socket_thread(uint32_t id)
     : _id(id)
     , _cv()
     , _mutex()
@@ -16,12 +16,12 @@ homeless::socket_thread::socket_thread(uint32_t id)
     LOGD << "Constructed socket thread - " << _id;
 }
 
-homeless::socket_thread::~socket_thread()
+hl::socket_thread::~socket_thread()
 {
     LOGD << "Destructed socket thread - " << _id;
 }
 
-void homeless::socket_thread::run(socket_thread *$this)
+void hl::socket_thread::run(socket_thread *$this)
 {
     while ($this->_alive)
     {
@@ -33,24 +33,24 @@ void homeless::socket_thread::run(socket_thread *$this)
                 break;
             session = $this->_queued_sessions.front();
             $this->_queued_sessions.pop_front();
-            LOGV << "socket " << session->get_id() << " was dequeued from socket thread - " << $this->_id;
+            LOGV << session << "was dequeued from socket thread - " << $this->_id;
         }
         session->do_socket_op();
     }
     LOGD << "socket thread - " << $this->_id << " has finished.";
 }
 
-void homeless::socket_thread::enqueue(abstract_session* session)
+void hl::socket_thread::enqueue(abstract_session* session)
 {
     synchronized (_mutex)
     {
         _queued_sessions.push_back(session);
-        LOGV << "socket " << session->get_id() << " was enqueued to socket thread - " << _id;
+        LOGV << session << "was enqueued to socket thread - " << _id;
     }
     _cv.notify_one();
 }
 
-void homeless::socket_thread::stop()
+void hl::socket_thread::stop()
 {
     _alive = false;
     _cv.notify_all();

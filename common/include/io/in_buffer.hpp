@@ -14,19 +14,16 @@ class basic_in_buffer {
 private:
     std::vector<Ty> _buffer;
     size_t _offset;
-    size_t _virtual_size;
 
 public:
 
     basic_in_buffer()
         : _buffer()
-        , _offset(0)
-        , _virtual_size(0) {}
+        , _offset(0) {}
 
     basic_in_buffer(const void* buffer, size_t len)
         : _buffer()
         , _offset(0)
-        , _virtual_size(0)
     {
         append_buffer(buffer, len);
     }
@@ -35,12 +32,13 @@ public:
     basic_in_buffer& operator= (basic_in_buffer&&) = delete;
 
     template<typename T>
-    const T& read()
+    T read()
     {
-        if (_offset + sizeof(T) >= get_virtual_size())
+        if (_offset + sizeof(T) > get_raw_buffer_size())
             throw end_of_stream_exception();
         std::array<Ty, sizeof(T)> tmp;
-        std::memcpy(tmp.data(), _buffer.data(), sizeof(T));
+        std::memcpy(tmp.data(), &_buffer[_offset], sizeof(T));
+        _offset += sizeof(T);
         return std::bit_cast<T>(tmp);
     }
 
@@ -53,40 +51,27 @@ public:
     std::string read_str()
     {
         const auto len = read<uint16_t>();
-        if (_offset + len >= get_virtual_size())
+        if (_offset + len > get_raw_buffer_size())
             throw end_of_stream_exception();
-        auto ret = std::string(&_buffer[_offset], static_cast<size_t>(len));
+        if (len == 0)
+            return "";
+        auto ret = std::string(reinterpret_cast<const char*>(&_buffer[_offset]), static_cast<size_t>(len));
         _offset += len;
         return ret;
     }
 
     void read(void* dst, size_t len)
     {
-        if (_offset + len >= get_virtual_size())
+        if (_offset + len > get_raw_buffer_size())
             throw end_of_stream_exception();
         std::memcpy(dst, &_buffer[_offset], len);
-    }
-
-    void set_virtual_size(size_t virtual_size)
-    {
-        _virtual_size = virtual_size;
-    }
-
-    void pull_used_packet(size_t size)
-    {
-        _buffer.erase(_buffer.begin(), std::next(_buffer.begin(), size));
+        _offset += len;
     }
 
     [[nodiscard]]
     std::string dump_packet() const
     {
-        return homeless::net_tools::dump_memory(get_raw_buffer(), get_virtual_size());
-    }
-
-    [[nodiscard]]
-    size_t get_virtual_size() const
-    {
-        return _virtual_size;
+        return hl::net_tools::dump_memory(get_raw_buffer(), get_raw_buffer_size());
     }
 
     [[nodiscard]]

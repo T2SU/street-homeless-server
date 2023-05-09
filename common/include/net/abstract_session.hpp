@@ -10,7 +10,7 @@
 #include "memory/memory_pool.hpp"
 #include "socket_job.hpp"
 
-namespace homeless
+namespace hl
 {
     class abstract_session {
     public:
@@ -38,7 +38,7 @@ namespace homeless
         std::string _remote_address;
         std::string _remote_endpoint;
         read_buffer _read_buffer;
-        std::vector<write_job> _write_jobs;
+        std::list<std::shared_ptr<write_job>> _write_jobs;
         const uint32_t _id;
         std::queue<socket_job> _jobs;
         std::mutex _mutex;
@@ -47,16 +47,13 @@ namespace homeless
         void init_remote_address();
 
         void do_socket_op();
-        void on_write(std::shared_ptr<out_buffer> out_buf);
+        void on_write(const std::shared_ptr<out_buffer>& out_buf);
         void enqueue_into_thread_pool(socket_job&& val);
 
         static void alloc_buffer_uv(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf);
         static void on_read_uv(uv_stream_t* client, ssize_t read_size, const uv_buf_t* buf);
         static void on_write_uv(uv_write_t *req, int status);
-        static void on_close_uv(uv_handle_t* handle);
 
-        template<typename SessionTy> requires (std::is_base_of_v<abstract_session, SessionTy> && !std::is_same_v<abstract_session, SessionTy>)
-        friend class acceptor;
         friend class socket_thread;
 
     protected:
@@ -70,7 +67,31 @@ namespace homeless
 
         void close(close_reason reason = close_reason::server_close);
         void write(const out_buffer& out_buf);
+
+        virtual const char* get_type_name() const = 0;
+
+        template<typename Serv, typename SessTy> requires std::is_convertible_v<SessTy*, abstract_session*>
+        void init(uv_loop_t* loop, uv_stream_t* server, Serv* serv, SessTy*)
+        {
+            auto stream = reinterpret_cast<uv_stream_t*>(&_client);
+            uv_tcp_init(loop, &_client);
+            auto accept_res = uv_accept(server, stream);
+            if (accept_res)
+            {
+                LOGD << "failed to accept. close client force. reason:" << uv_strerror(accept_res);
+                uv_close(reinterpret_cast<uv_handle_t*>(&_client), [](uv_handle_t*){});
+                return;
+            }
+            _client.data = this;
+            init_remote_address();
+            serv->on_accept(reinterpret_cast<SessTy*>(this));
+            uv_read_start(stream, alloc_buffer_uv, on_read_uv);
+        }
     };
+
+    std::ostream& operator<<(std::ostream& os, const hl::abstract_session& sess);
+    std::ostream& operator<<(std::ostream& os, const hl::abstract_session* sess);
 }
+
 
 #endif //STREET_HOMELESS_SERVER_ABSTRACT_SESSION_HPP

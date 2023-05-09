@@ -29,6 +29,7 @@
 #include <plog/Appenders/ColorConsoleAppender.h>
 #include <uv.h>
 #include "utils/synchronized.hpp"
+#include "utils/singleton.hpp"
 #include "constants.hpp"
 
 #endif //STD_COMMON_HPP

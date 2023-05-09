@@ -5,7 +5,7 @@
 #ifndef STREET_HOMELESS_SERVER_PACKET_HPP
 #define STREET_HOMELESS_SERVER_PACKET_HPP
 
-namespace homeless
+namespace hl
 {
     #pragma pack(push, 2)
 

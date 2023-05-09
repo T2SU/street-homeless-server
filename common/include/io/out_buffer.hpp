@@ -6,6 +6,7 @@
 #define STREET_HOMELESS_SERVER_OUT_BUFFER_HPP
 
 #include "io/io_concept.hpp"
+#include "net/message.hpp"
 #include "net/network_exceptions.hpp"
 #include "utils/net_tools.hpp"
 
@@ -17,7 +18,7 @@ private:
 
 public:
     basic_out_buffer() = default;
-    explicit basic_out_buffer(size_t size) : _buffer(size) {}
+    explicit basic_out_buffer(size_t size) : _buffer() { _buffer.reserve(size); }
     virtual ~basic_out_buffer() = default;
 
     [[nodiscard]]
@@ -54,15 +55,18 @@ public:
     [[nodiscard]]
     std::string dump_packet() const
     {
-        return homeless::net_tools::dump_memory(get_buffer(), get_buffer_size());
+        return hl::net_tools::dump_memory(get_buffer(), get_buffer_size());
     }
 };
 
 class out_buffer : public basic_out_buffer<std::byte>
 {
 public:
-    out_buffer() = default;
-    explicit out_buffer(size_t size) : basic_out_buffer(size) {}
+    out_buffer() : basic_out_buffer() {}
+    explicit out_buffer(svr_msg msg, size_t size = 128) : basic_out_buffer(size)
+    {
+        write(msg);
+    }
     ~out_buffer() override = default;
 };
 

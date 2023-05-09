@@ -5,7 +5,7 @@
 #ifndef STREET_HOMELESS_SERVER_SINGLETON_HPP
 #define STREET_HOMELESS_SERVER_SINGLETON_HPP
 
-namespace homeless
+namespace hl
 {
     template<typename T>
     class singleton

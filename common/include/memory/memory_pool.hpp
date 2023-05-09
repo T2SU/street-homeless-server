@@ -2,7 +2,7 @@
 // Created by TSU on 2023-05-03.
 //
 
-namespace homeless
+namespace hl
 {
     template<int BufferSize, int InitPoolSize, typename Alloc = std::allocator<std::byte>>
     class memory_pool

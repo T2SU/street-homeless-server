@@ -5,7 +5,7 @@
 #ifndef STREET_HOMELESS_SERVER_NET_TOOLS_HPP
 #define STREET_HOMELESS_SERVER_NET_TOOLS_HPP
 
-namespace homeless
+namespace hl
 {
     class net_tools {
     public:

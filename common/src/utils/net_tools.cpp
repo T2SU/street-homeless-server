@@ -5,7 +5,7 @@
 #include "std_common.hpp"
 #include "utils/net_tools.hpp"
 
-std::string homeless::net_tools::dump_memory(const void *buffer, size_t len)
+std::string hl::net_tools::dump_memory(const void *buffer, size_t len)
 {
     const char*         buf = reinterpret_cast<const char*>(buffer);
     std::stringstream   ss;
@@ -13,7 +13,7 @@ std::string homeless::net_tools::dump_memory(const void *buffer, size_t len)
     while (len-- != 0)
     {
         const auto x = *(buf++);
-        ss << std::format("{:02X}", static_cast<unsigned long>(x));
+        ss << std::format("{:02X}", static_cast<unsigned char>(x));
         if (len == 0)
             break;
         ss << ' ';

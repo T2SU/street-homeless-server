@@ -5,7 +5,7 @@
 #ifndef STREET_HOMELESS_SERVER_SOCKET_THREAD_HPP
 #define STREET_HOMELESS_SERVER_SOCKET_THREAD_HPP
 
-namespace homeless
+namespace hl
 {
     class abstract_session;
 

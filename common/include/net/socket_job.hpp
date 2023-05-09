@@ -8,7 +8,7 @@
 #include "io/in_buffer.hpp"
 #include "io/out_buffer.hpp"
 
-namespace homeless
+namespace hl
 {
     enum class socket_op { READ, WRITE, CLOSE };
 
@@ -27,6 +27,7 @@ namespace homeless
         uv_write_t req;
         uv_buf_t buf;
         std::shared_ptr<out_buffer> out_buf;
+        std::list<std::shared_ptr<struct write_job>>::iterator pointer;
     } write_job;
 }
 
