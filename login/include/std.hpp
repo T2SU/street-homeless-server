@@ -7,6 +7,6 @@
 
 #include <std_common.hpp>
 #include <thread/socket_thread_pool.hpp>
-#include <net/message.hpp>
+#include "messages.pb.h"
 
 #endif //STREET_HOMELESS_SERVER_STD_HPP

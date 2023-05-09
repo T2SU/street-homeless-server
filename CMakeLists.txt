@@ -17,6 +17,13 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
+find_package(Protobuf REQUIRED)
+add_subdirectory(street-homeless-protobuf)
+include_directories(${Protobuf_INCLUDE_DIRS})
+
+get_property(PROTO_HEADER_DIR GLOBAL PROPERTY PROTO_HEADER_DIR_PROPERTY)
+message( STATUS "Protobuf headers : ${PROTO_HEADER_DIR}" )
+
 add_subdirectory(plog)
 add_subdirectory(yaml-cpp)
 add_subdirectory(libuv)

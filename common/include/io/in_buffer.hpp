@@ -5,6 +5,12 @@
 #ifndef STREET_HOMELESS_SERVER_IN_BUFFER_HPP
 #define STREET_HOMELESS_SERVER_IN_BUFFER_HPP
 
+#if defined(_MSC_VER) ||                                            \
+    (defined(__GNUC__) && (__GNUC__ == 3 && __GNUC_MINOR__ >= 4) || \
+     (__GNUC__ >= 4))  // GCC supports "pragma once" correctly since 3.4
+#pragma once
+#endif
+
 #include "io/io_concept.hpp"
 #include "net/network_exceptions.hpp"
 #include "utils/net_tools.hpp"
@@ -66,6 +72,15 @@ public:
             throw end_of_stream_exception();
         std::memcpy(dst, &_buffer[_offset], len);
         _offset += len;
+    }
+
+    template<typename T>
+    void read_pb(T& protobuf)
+    {
+        size_t len = protobuf.ByteSizeLong();
+        if (_offset + len > get_raw_buffer_size())
+            throw end_of_stream_exception();
+        protobuf.ParseFromArray(reinterpret_cast<void*>(&_buffer[_offset]), len);
     }
 
     [[nodiscard]]

@@ -5,8 +5,14 @@
 #ifndef STREET_HOMELESS_SERVER_OUT_BUFFER_HPP
 #define STREET_HOMELESS_SERVER_OUT_BUFFER_HPP
 
+#if defined(_MSC_VER) ||                                            \
+    (defined(__GNUC__) && (__GNUC__ == 3 && __GNUC_MINOR__ >= 4) || \
+     (__GNUC__ >= 4))  // GCC supports "pragma once" correctly since 3.4
+#pragma once
+#endif
+
 #include "io/io_concept.hpp"
-#include "net/message.hpp"
+#include "messages.pb.h"
 #include "net/network_exceptions.hpp"
 #include "utils/net_tools.hpp"
 
@@ -40,6 +46,14 @@ public:
         _buffer.insert(_buffer.end(), tmp.begin(), tmp.end());
     }
 
+    template<typename T>
+    void write_pb(const T& protobuf)
+    {
+        size_t size = protobuf.ByteSizeLong();
+        _buffer.reserve(_buffer.size() + size);
+        protobuf.SerializeToArray(&_buffer[_buffer.size()], size);
+    }
+
     void write_str(const std::string& str)
     {
         write(static_cast<uint16_t>(str.length()));
@@ -63,9 +77,9 @@ class out_buffer : public basic_out_buffer<std::byte>
 {
 public:
     out_buffer() : basic_out_buffer() {}
-    explicit out_buffer(svr_msg msg, size_t size = 128) : basic_out_buffer(size)
+    explicit out_buffer(pb::ServerMessage msg, size_t size = 128) : basic_out_buffer(size)
     {
-        write(msg);
+        write<uint16_t>(msg);
     }
     ~out_buffer() override = default;
 };

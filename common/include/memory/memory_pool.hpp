@@ -2,6 +2,15 @@
 // Created by TSU on 2023-05-03.
 //
 
+#if defined(_MSC_VER) ||                                            \
+    (defined(__GNUC__) && (__GNUC__ == 3 && __GNUC_MINOR__ >= 4) || \
+     (__GNUC__ >= 4))  // GCC supports "pragma once" correctly since 3.4
+#pragma once
+#endif
+
+#ifndef _MEMORY_POOL_HPP_
+#define _MEMORY_POOL_HPP_
+
 namespace hl
 {
     template<int BufferSize, int InitPoolSize, typename Alloc = std::allocator<std::byte>>
@@ -71,3 +80,5 @@ namespace hl
         }
     };
 }
+
+#endif

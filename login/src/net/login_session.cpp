@@ -5,6 +5,8 @@
 #include "std.hpp"
 #include "net/login_session.hpp"
 #include "net/login_server.hpp"
+#include "account_data.pb.h"
+#include "login_result.pb.h"
 
 hl::login::login_session::login_session(uint32_t id)
         : abstract_session(id)
@@ -24,13 +26,13 @@ const char *hl::login::login_session::get_type_name() const
 void hl::login::login_session::on_packet(in_buffer &in_buffer)
 {
     LOGI << this << "on packet login session.";
-    const auto op = in_buffer.read<cli_msg>();
+    const auto op = in_buffer.read<uint16_t>();
     switch (op)
     {
-        case cli_msg::CheckAliveRes:
+        case pb::ClientMessage::CheckAliveRes:
             on_check_alive_res(in_buffer);
             break;
-        case cli_msg::LoginReq:
+        case pb::ClientMessage::LoginReq:
             on_login_req(in_buffer);
             break;
     }
@@ -43,21 +45,25 @@ void hl::login::login_session::on_check_alive_res(in_buffer &in_buf)
 
 void hl::login::login_session::on_login_req(in_buffer &in_buf)
 {
+
     const auto username(in_buf.read_str());
     const auto password(in_buf.read_str());
 
     LOGI << "username = " << username;
     LOGI << "password = " << password;
 
-    out_buffer out_buf(svr_msg::LoginRes);
-    if (username == "test" && password == "test")
-    {
-        out_buf.write<char>(0);
-        out_buf.write_str("가난 시뮬레이션에 오신 것을 환영합니다!\nWelcome to the homeless simulator!!");
-    }
+    out_buffer out_buf(pb::ServerMessage::LoginRes);
+    if (username != "test")
+        out_buf.write<char>(pb::LoginResult::InvalidAccount);
+    else if (password != "test")
+        out_buf.write<char>(pb::LoginResult::InvalidPassword);
     else
     {
-        out_buf.write<char>(1);
+        pb::AccountData account_data;
+        out_buf.write(pb::LoginResult::Success);
+        account_data.set_uid(1024);
+        account_data.set_name(username);
+        out_buf.write_pb(account_data);
     }
     write(out_buf);
 }

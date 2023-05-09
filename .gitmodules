@@ -7,3 +7,6 @@
 [submodule "libuv"]
 	path = libuv
 	url = https://github.com/libuv/libuv.git
+[submodule "street-homeless-protobuf"]
+	path = street-homeless-protobuf
+	url = https://github.com/T2SU/street-homeless-protobuf.git
