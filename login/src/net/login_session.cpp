@@ -7,6 +7,9 @@
 #include "net/login_server.hpp"
 #include "account_data.pb.h"
 #include "login_result.pb.h"
+#include "player_data.pb.h"
+#include "player_stat.pb.h"
+#include "inventory.pb.h"
 
 hl::login::login_session::login_session(uint32_t id)
         : abstract_session(id)
@@ -35,6 +38,9 @@ void hl::login::login_session::on_packet(in_buffer &in_buffer)
         case pb::ClientMessage::LoginReq:
             on_login_req(in_buffer);
             break;
+        case pb::ClientMessage::SelectCharacterReq:
+            on_select_character_req(in_buffer);
+            break;
     }
 }
 
@@ -45,7 +51,6 @@ void hl::login::login_session::on_check_alive_res(in_buffer &in_buf)
 
 void hl::login::login_session::on_login_req(in_buffer &in_buf)
 {
-
     const auto username(in_buf.read_str());
     const auto password(in_buf.read_str());
 
@@ -54,16 +59,57 @@ void hl::login::login_session::on_login_req(in_buffer &in_buf)
 
     out_buffer out_buf(pb::ServerMessage::LoginRes);
     if (username != "test")
-        out_buf.write<char>(pb::LoginResult::InvalidAccount);
+        out_buf.write<uint8_t>(pb::LoginResult::InvalidAccount);
     else if (password != "test")
-        out_buf.write<char>(pb::LoginResult::InvalidPassword);
+        out_buf.write<uint8_t>(pb::LoginResult::InvalidPassword);
     else
     {
         pb::AccountData account_data;
-        out_buf.write(pb::LoginResult::Success);
-        account_data.set_uid(1024);
+        out_buf.write<uint8_t>(pb::LoginResult::Success);
+        account_data.set_uid(100);
         account_data.set_name(username);
         out_buf.write_pb(account_data);
     }
     write(out_buf);
+}
+
+void hl::login::login_session::on_select_character_req(in_buffer &in_buf)
+{
+    pb::PlayerData playerData;
+    pb::PlayerStat playerStat;
+    pb::Inventory inventory;
+
+    playerStat.set_health(100);
+    playerStat.set_tiredness(0);
+    playerStat.set_max_health(100);
+    playerStat.set_max_tiredness(100);
+
+    inventory.set_money(860);
+    const std::vector<std::pair<int ,int>> test_items(
+    {
+        {40000000, 10}, // 박스떼기
+        {40000001, 54}, // 노숙일보
+        {30000000, 3}, // 뚜껑없는 깡통
+        {20000000, 1}, // LPG(소)
+    });
+
+    auto sn = 0;
+    for (const auto& test_item : test_items)
+    {
+        auto i = inventory.add_items();
+        i->set_sn(sn++);
+        i->set_item_id(test_item.first);
+        i->set_amount(test_item.second);
+    }
+
+    playerData.set_allocated_inventory(&inventory);
+    playerData.set_allocated_stat(&playerStat);
+    playerData.set_name("김철남");
+
+    out_buffer out_buf(pb::ServerMessage::SetStage);
+    out_buf.write_pb(playerData);
+    write(out_buf);
+
+    playerData.release_inventory();
+    playerData.release_stat();
 }

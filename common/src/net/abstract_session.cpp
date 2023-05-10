@@ -130,6 +130,7 @@ void hl::abstract_session::on_read_uv(uv_stream_t *client, ssize_t read_size, co
                 socket_job job{.op=socket_op::READ, .in_buffer=in_buf};
                 $this->enqueue_into_thread_pool(std::move(job));
 
+                rb.mode = read_mode::HEADER;
                 break;
             }
         }

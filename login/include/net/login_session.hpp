@@ -29,6 +29,7 @@ namespace hl::login
     private:
         void on_check_alive_res(in_buffer& in_buf);
         void on_login_req(in_buffer& in_buf);
+        void on_select_character_req(in_buffer& in_buf);
     };
 }
 

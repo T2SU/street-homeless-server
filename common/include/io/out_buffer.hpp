@@ -50,8 +50,10 @@ public:
     void write_pb(const T& protobuf)
     {
         size_t size = protobuf.ByteSizeLong();
-        _buffer.reserve(_buffer.size() + size);
-        protobuf.SerializeToArray(&_buffer[_buffer.size()], size);
+        size_t offset = _buffer.size();
+        _buffer.resize(offset + size);
+        protobuf.SerializeToArray(&_buffer.data()[offset], size);
+
     }
 
     void write_str(const std::string& str)
