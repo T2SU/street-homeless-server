@@ -37,7 +37,9 @@
 #include <plog/Init.h>
 #include <plog/Formatters/TxtFormatter.h>
 #include <plog/Appenders/ColorConsoleAppender.h>
+#include <plog/Record.h>
 #include <uv.h>
+#include <openssl/sha.h>
 
 #include "utils/synchronized.hpp"
 #include "utils/singleton.hpp"
@@ -46,6 +48,7 @@
 #undef min
 #undef max
 #include <sqlpp11/postgresql/postgresql.h>
+#include <sqlpp11/mysql/mysql.h>
 #include <sqlpp11/sqlpp11.h>
 
 #endif //STD_COMMON_HPP

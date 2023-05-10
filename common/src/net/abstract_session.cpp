@@ -278,15 +278,3 @@ static const char* close_reason_to_str(close_reason reason)
             return "unknown";
     }
 }
-
-std::ostream& hl::operator<<(std::ostream& os, const hl::abstract_session& sess)
-{
-    os << "[" << sess.get_type_name() << "-" << sess.get_id() << "] ";
-    return os;
-}
-
-std::ostream& hl::operator<<(std::ostream& os, const hl::abstract_session* sess)
-{
-    os << *sess;
-    return os;
-}

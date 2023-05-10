@@ -1,0 +1,30 @@
+{
+  "name" : "street-homeless-server",
+  "version-string" : "1.0.0",
+  "builtin-baseline" : "512d62f7ee117ccf3176a8acf96a0a6ce7a22dd3",
+  "dependencies" : [ {
+    "name" : "openssl",
+    "version>=" : "3.1.0#4"
+  }, {
+    "name" : "libuv",
+    "version>=" : "1.44.2"
+  }, {
+    "name" : "libpq",
+    "version>=" : "15.2#3"
+  }, {
+    "name" : "libmariadb",
+    "version>=" : "3.3.1#2"
+  }, {
+    "name" : "date",
+    "version>=" : "3.0.1#2"
+  }, {
+    "name" : "yaml-cpp",
+    "version>=" : "0.7.0#1"
+  }, {
+    "name" : "sqlpp11",
+    "version>=" : "0.61#2"
+  }, {
+    "name" : "protobuf",
+    "version>=" : "3.21.12"
+  } ]
+}

@@ -95,9 +95,15 @@ namespace hl
         }
     };
 
-    std::ostream& operator<<(std::ostream& os, const hl::abstract_session& sess);
-    std::ostream& operator<<(std::ostream& os, const hl::abstract_session* sess);
-}
+    inline std::ostream& operator<<(std::ostream& os, const hl::abstract_session& sess)
+    {
+        return os << "[" << sess.get_type_name() << "-" << sess.get_id() << "] ";
+    }
 
+    inline std::ostream& operator<<(std::ostream& os, const hl::abstract_session* const& sess)
+    {
+        return operator<<(os, *sess);
+    }
+}
 
 #endif //STREET_HOMELESS_SERVER_ABSTRACT_SESSION_HPP

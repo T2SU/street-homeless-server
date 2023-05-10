@@ -33,5 +33,4 @@ namespace hl::login
     };
 }
 
-
 #endif //STREET_HOMELESS_SERVER_LOGIN_SESSION_HPP

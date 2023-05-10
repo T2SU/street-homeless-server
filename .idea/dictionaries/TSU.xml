@@ -2,6 +2,7 @@
   <dictionary name="TSU">
     <words>
       <w>getpeername</w>
+      <w>sqlpp</w>
     </words>
   </dictionary>
 </component>

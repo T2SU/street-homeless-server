@@ -45,7 +45,7 @@ namespace hl
 
         void release_session(SessTy* session);
 
-        void begin(std::string bind_address, uint16_t bind_port);
+        void begin(const std::string& bind_address, uint16_t bind_port);
         void end();
 
         virtual void on_accept(SessTy* session) = 0;
@@ -131,7 +131,7 @@ namespace hl
     }
 
     template<SessionType SessTy>
-    void abstract_server<SessTy>::begin(std::string bind_address, uint16_t bind_port)
+    void abstract_server<SessTy>::begin(const std::string& bind_address, uint16_t bind_port)
     {
         uv_ip4_addr(bind_address.c_str(), bind_port, &_addr);
         _server.data = this;

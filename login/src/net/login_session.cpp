@@ -54,47 +54,75 @@ void hl::login::login_session::on_login_req(in_buffer &in_buf)
 
     out_buffer out_buf(pb::ServerMessage::LoginRes);
 
-    namespace sql = sqlpp::postgresql;
-
+//    namespace sql = sqlpp::postgresql;
+//    auto config = std::make_shared<sql::connection_config>();
+//    config->user = "postgres";
+//    config->password = "fndndnxm";
+//    config->dbname = "homeless";
+//    config->debug = true;
+    namespace sql = sqlpp::mysql;
     auto config = std::make_shared<sql::connection_config>();
-    config->user = "postgres";
+    config->user = "root";
     config->password = "fndndnxm";
-    config->dbname = "homeless";
+    config->database = "homeless";
+    config->port = 3306;
     config->debug = true;
+
     try
     {
+        db::Users user{};
         sql::connection db(config);
-        db::PublicUsers user;
+        auto tx = hl::mysql::start_transaction(db, sqlpp::isolation_level::repeatable_read);
 
-        auto result = db(select(user.name, user.password, user.salt, user.uid, user.sessionIp).from(user).where(user.name.like(username)));
-        if (result.size() == 0)
-        {
-            out_buf.write<uint8_t>(pb::LoginResult::InvalidAccount);
-        }
-        else
+        auto result = db(
+                select(user.name, user.password, user.salt, user.uid, user.sessionIp).
+                from(user).
+                where(user.name.like(username)));
+        if (!result.empty())
         {
             const auto& row = *result.begin();
+            const auto hash = hl::hash::sha512(std::string(password) + row.salt.text);
+            if (hash == row.password.text)
+            {
+                if (row.sessionIp.is_null())
+                {
+                    try
+                    {
+                        db(sql::update(user).set(user.sessionIp = get_remote_address()).where(user.uid == row.uid));
 
+                        pb::AccountData account_data;
+                        out_buf.write<uint8_t>(pb::LoginResult::Success);
+                        account_data.set_uid(row.uid);
+                        account_data.set_name(row.name);
+                        out_buf.write_pb(account_data);
+                    }
+                    catch (const std::exception& ex)
+                    {
+                        LOGE << "sql error " << ex.what();
+                        out_buf.write<uint8_t>(pb::LoginResult::DatabaseError);
+                    }
+                }
+                else
+                {
+                    out_buf.write<uint8_t>(pb::LoginResult::AlreadyConnected); // 이미 접속중
+                }
+            }
+            else
+            {
+                out_buf.write<uint8_t>(pb::LoginResult::InvalidPassword); // 잘못된 패스워드
+            }
         }
-
-        if (username != "test")
-            out_buf.write<uint8_t>(pb::LoginResult::InvalidAccount);
-        else if (password != "test")
-            out_buf.write<uint8_t>(pb::LoginResult::InvalidPassword);
         else
         {
-            pb::AccountData account_data;
-            out_buf.write<uint8_t>(pb::LoginResult::Success);
-            account_data.set_uid(100);
-            account_data.set_name(username);
-            out_buf.write_pb(account_data);
+            out_buf.write<uint8_t>(pb::LoginResult::InvalidAccount); // 잘못된 계정
         }
+        tx.commit();
     }
     catch (const sqlpp::exception& e)
     {
+        LOGE << "sql error " << e.what();
         out_buf.write<uint8_t>(pb::LoginResult::DatabaseError);
     }
-
 
     write(out_buf);
 }
