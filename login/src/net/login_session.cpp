@@ -5,11 +5,6 @@
 #include "std.hpp"
 #include "net/login_session.hpp"
 #include "net/login_server.hpp"
-#include "account_data.pb.h"
-#include "login_result.pb.h"
-#include "player_data.pb.h"
-#include "player_stat.pb.h"
-#include "inventory.pb.h"
 
 hl::login::login_session::login_session(uint32_t id)
         : abstract_session(id)
@@ -58,18 +53,49 @@ void hl::login::login_session::on_login_req(in_buffer &in_buf)
     LOGI << "password = " << password;
 
     out_buffer out_buf(pb::ServerMessage::LoginRes);
-    if (username != "test")
-        out_buf.write<uint8_t>(pb::LoginResult::InvalidAccount);
-    else if (password != "test")
-        out_buf.write<uint8_t>(pb::LoginResult::InvalidPassword);
-    else
+
+    namespace sql = sqlpp::postgresql;
+
+    auto config = std::make_shared<sql::connection_config>();
+    config->user = "postgres";
+    config->password = "fndndnxm";
+    config->dbname = "homeless";
+    config->debug = true;
+    try
     {
-        pb::AccountData account_data;
-        out_buf.write<uint8_t>(pb::LoginResult::Success);
-        account_data.set_uid(100);
-        account_data.set_name(username);
-        out_buf.write_pb(account_data);
+        sql::connection db(config);
+        db::PublicUsers user;
+
+        auto result = db(select(user.name, user.password, user.salt, user.uid, user.sessionIp).from(user).where(user.name.like(username)));
+        if (result.size() == 0)
+        {
+            out_buf.write<uint8_t>(pb::LoginResult::InvalidAccount);
+        }
+        else
+        {
+            const auto& row = *result.begin();
+
+        }
+
+        if (username != "test")
+            out_buf.write<uint8_t>(pb::LoginResult::InvalidAccount);
+        else if (password != "test")
+            out_buf.write<uint8_t>(pb::LoginResult::InvalidPassword);
+        else
+        {
+            pb::AccountData account_data;
+            out_buf.write<uint8_t>(pb::LoginResult::Success);
+            account_data.set_uid(100);
+            account_data.set_name(username);
+            out_buf.write_pb(account_data);
+        }
     }
+    catch (const sqlpp::exception& e)
+    {
+        out_buf.write<uint8_t>(pb::LoginResult::DatabaseError);
+    }
+
+
     write(out_buf);
 }
 
@@ -105,6 +131,7 @@ void hl::login::login_session::on_select_character_req(in_buffer &in_buf)
     playerData.set_allocated_inventory(&inventory);
     playerData.set_allocated_stat(&playerStat);
     playerData.set_name("김철남");
+    playerData.set_pid(1000);
 
     out_buffer out_buf(pb::ServerMessage::SetStage);
     out_buf.write_pb(playerData);

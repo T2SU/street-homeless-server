@@ -4,6 +4,8 @@
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/libuv" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/plog" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/sqlpp11" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/sqlpp11/build/_deps/date-src" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/street-homeless-protobuf" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/yaml-cpp" vcs="Git" />
   </component>

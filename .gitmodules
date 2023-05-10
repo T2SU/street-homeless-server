@@ -10,3 +10,6 @@
 [submodule "street-homeless-protobuf"]
 	path = street-homeless-protobuf
 	url = https://github.com/T2SU/street-homeless-protobuf.git
+[submodule "sqlpp11"]
+	path = sqlpp11
+	url = https://github.com/rbock/sqlpp11.git

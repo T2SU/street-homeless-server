@@ -11,6 +11,11 @@
 #pragma once
 #endif
 
+#if _WIN32
+// #define WIN32_LEAN_AND_MEAN
+// #include <windows.h>
+#endif
+
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -33,8 +38,14 @@
 #include <plog/Formatters/TxtFormatter.h>
 #include <plog/Appenders/ColorConsoleAppender.h>
 #include <uv.h>
+
 #include "utils/synchronized.hpp"
 #include "utils/singleton.hpp"
 #include "constants.hpp"
+
+#undef min
+#undef max
+#include <sqlpp11/postgresql/postgresql.h>
+#include <sqlpp11/sqlpp11.h>
 
 #endif //STD_COMMON_HPP
