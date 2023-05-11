@@ -24,6 +24,7 @@ DROP TABLE IF EXISTS `characters`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `characters` (
   `pid` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `uid` bigint(20) unsigned NOT NULL,
   `name` varchar(20) NOT NULL,
   `health` int(11) NOT NULL,
   `tiredness` int(11) NOT NULL,
@@ -34,7 +35,9 @@ CREATE TABLE `characters` (
   `last_connected` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`pid`),
   UNIQUE KEY `name` (`name`),
-  KEY `money` (`money`)
+  KEY `money` (`money`),
+  KEY `uid` (`uid`),
+  CONSTRAINT `FK_characters_users` FOREIGN KEY (`uid`) REFERENCES `users` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -45,6 +48,33 @@ CREATE TABLE `characters` (
 LOCK TABLES `characters` WRITE;
 /*!40000 ALTER TABLE `characters` DISABLE KEYS */;
 /*!40000 ALTER TABLE `characters` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `inventory`
+--
+
+DROP TABLE IF EXISTS `inventory`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `inventory` (
+  `sn` bigint(20) unsigned NOT NULL,
+  `pid` bigint(20) unsigned NOT NULL,
+  `itemid` int(11) NOT NULL,
+  `amount` int(11) NOT NULL,
+  PRIMARY KEY (`sn`),
+  KEY `pid` (`pid`),
+  CONSTRAINT `FK_inventory_characters` FOREIGN KEY (`pid`) REFERENCES `characters` (`pid`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `inventory`
+--
+
+LOCK TABLES `inventory` WRITE;
+/*!40000 ALTER TABLE `inventory` DISABLE KEYS */;
+/*!40000 ALTER TABLE `inventory` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -88,4 +118,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-05-11  4:34:14
+-- Dump completed on 2023-05-12  3:16:54

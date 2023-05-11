@@ -23,6 +23,7 @@
 #include <vector>
 #include <queue>
 #include <thread>
+#include <chrono>
 #include <format>
 #include <memory>
 #include <array>
@@ -33,6 +34,8 @@
 #include <algorithm>
 #include <mutex>
 #include <cstdio>
+#include <cstdlib>
+#include <filesystem>
 #include <plog/Log.h>
 #include <plog/Init.h>
 #include <plog/Formatters/TxtFormatter.h>
@@ -40,6 +43,7 @@
 #include <plog/Record.h>
 #include <uv.h>
 #include <openssl/sha.h>
+#include <yaml-cpp/yaml.h>
 
 #include "utils/synchronized.hpp"
 #include "utils/singleton.hpp"

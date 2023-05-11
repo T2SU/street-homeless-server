@@ -511,9 +511,9 @@ def help_message():
         "Usage:\n"
         "ddl2cpp [optional args] <path to ddl> <path to target> <namespace>\n\n"
         "OPTIONAL ARGUMENTS:\n" + arg_string + "\n"
-        "<path to ddl>    path to your SQL database/table definitions (SHOW CREATE TABLE SomeTable) \n"
+        "<path to ddl>    path to your SQL db/table definitions (SHOW CREATE TABLE SomeTable) \n"
         "<path to target> path to a generated C++ header file without extension (no *.h). \n"
-        "<namespace>      namespace you want. Usually a project/database name\n"
+        "<namespace>      namespace you want. Usually a project/db name\n"
     )
     sys.exit(0)
 

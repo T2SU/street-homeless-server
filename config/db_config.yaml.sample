@@ -1,0 +1,6 @@
+username: 
+password: 
+port: 3306
+database: 
+pooling_min: 2
+pooling_max: 16

@@ -12,16 +12,22 @@
 #endif
 
 #include "login_session.hpp"
-#include <net/abstract_server.hpp>
 
 namespace hl::login
 {
     class login_server : public abstract_server<login_session>
     {
+    private:
+        hl::database::accessor _accessor;
+
     public:
         login_server()
-            : abstract_server() {}
+        : abstract_server()
+        , _accessor()
+        {
+        }
 
+        hl::database::accessor& accessor();
         void on_accept(login_session* session) override;
     };
 }

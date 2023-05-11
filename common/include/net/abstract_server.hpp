@@ -11,7 +11,9 @@
 #pragma once
 #endif
 
-#include "net/abstract_session.hpp"
+#include "abstract_session.hpp"
+#include "server.hpp"
+#include "utils/yaml_config.hpp"
 
 namespace hl
 {
@@ -19,7 +21,7 @@ namespace hl
     concept SessionType = std::is_base_of_v<abstract_session, SessTy> && !std::is_same_v<abstract_session, SessTy>;
 
     template<SessionType SessTy>
-    class abstract_server
+    class abstract_server : public server
     {
     private:
         uv_loop_t* _loop;
@@ -28,9 +30,14 @@ namespace hl
 
         SessTy* _sessions;
         std::queue<uint32_t> _session_pool;
-        std::unordered_map<uint32_t, SessTy*> _connections;
-        mutable std::mutex _mutex;
+        std::unordered_map<uint32_t, std::shared_ptr<SessTy>> _connected_sessions;
+        mutable std::recursive_mutex _mutex;
         std::allocator<SessTy> _allocator;
+        std::atomic_uint32_t _session_sn_counter;
+
+        int32_t _ping_interval;
+        int32_t _ping_timeout;
+        int32_t _packet_error_threshold;
 
         static void on_accept_uv(uv_stream_t *server, int status);
 
@@ -43,7 +50,9 @@ namespace hl
         size_t get_connection_num() const;
         void broadcast(const out_buffer& out_buf);
 
-        void release_session(SessTy* session);
+        void remove_from_connected(abstract_session* session) override;
+        void release_session(abstract_session* session) override;
+        bool try_get(uint32_t socket_sn, std::shared_ptr<SessTy>& ptr);
 
         void begin(const std::string& bind_address, uint16_t bind_port);
         void end();
@@ -58,14 +67,23 @@ namespace hl
             , _addr()
             , _sessions()
             , _session_pool()
-            , _connections()
+            , _connected_sessions()
             , _mutex()
             , _allocator()
+            , _session_sn_counter()
+            , _ping_interval()
+            , _ping_timeout()
+            , _packet_error_threshold()
     {
         uv_tcp_init(_loop, &_server);
         _sessions = _allocator.allocate(MaxSession);
         for (uint32_t i = 0; i < MaxSession; ++i)
             _session_pool.push(i);
+
+        const auto node = hl::yaml::load("common.yaml");
+        _ping_interval = node["network"]["ping"]["interval"].as<int32_t>(30);
+        _ping_timeout = node["network"]["ping"]["timeout"].as<int32_t>(60);
+        _packet_error_threshold = node["security"]["session"]["packet_error_threshold"].as<int32_t>(32);
     }
 
     template<SessionType SessTy>
@@ -90,12 +108,15 @@ namespace hl
     template<SessionType SessTy>
     void abstract_server<SessTy>::broadcast(const out_buffer &out_buf)
     {
+        std::vector<typename decltype(_connected_sessions)::value_type> targets;
+
         synchronized (_mutex)
         {
-            for (auto& con : _connections)
-            {
-                con.second->write(out_buf);
-            }
+            std::copy(_connected_sessions.begin(), _connected_sessions.end(), targets.end());
+        }
+        for (auto& con : targets)
+        {
+            con.second->write(out_buf);
         }
     }
 
@@ -111,23 +132,52 @@ namespace hl
             i = _session_pool.front();
             _session_pool.pop();
             session = &_sessions[i];
-            _connections[i] = session;
         }
-        std::allocator_traits<decltype(_allocator)>::construct(_allocator, session, i);
+        std::allocator_traits<decltype(_allocator)>::construct(_allocator, session, this, i, ++_session_sn_counter);
+        synchronized (_mutex)
+        {
+            _connected_sessions[session->get_socket_sn()] = std::shared_ptr<SessTy>(session, [this](SessTy* session) {
+                release_session(session);
+            });
+        }
         LOGV << "acquired a session - " << session;
         return session;
     }
 
     template<SessionType SessTy>
-    void abstract_server<SessTy>::release_session(SessTy *session)
+    void abstract_server<SessTy>::remove_from_connected(abstract_session *session)
+    {
+        LOGV << "remove from connected sessions - " << session;
+        synchronized (_mutex)
+        {
+            _connected_sessions.erase(session->get_socket_sn());
+        }
+    }
+
+    template<SessionType SessTy>
+    void abstract_server<SessTy>::release_session(abstract_session *session)
     {
         LOGV << "releasing a session... - " << session;
         std::allocator_traits<decltype(_allocator)>::destroy(_allocator, session);
         synchronized (_mutex)
         {
             _session_pool.push(session->get_id());
-            _connections.erase(session->get_id());
         }
+    }
+
+    template<SessionType SessTy>
+    bool abstract_server<SessTy>::try_get(uint32_t socket_sn, std::shared_ptr<SessTy> &ptr)
+    {
+        synchronized (_mutex)
+        {
+            auto found = _connected_sessions.find(socket_sn);
+            if (found != _connected_sessions.end())
+            {
+                ptr = found->second;
+                return true;
+            }
+        }
+        return false;
     }
 
     template<SessionType SessTy>

@@ -1,0 +1,7 @@
+max_severity: "verbose" # none
+                        # fatal
+                        # error
+                        # warning
+                        # info
+                        # debug
+                        # verbose

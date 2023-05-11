@@ -6,11 +6,16 @@ add_library(HomelessCommon STATIC
         src/net/packet.cpp
         src/thread/socket_thread.cpp
         src/net/abstract_server.cpp
+        src/net/packet_handler.cpp
         src/thread/socket_thread_pool.cpp
         src/net/socket_job.cpp
         src/std_common.cpp
         src/utils/hash.cpp
-        src/utils/mysql_transaction.cpp)
+        src/utils/mysql_transaction.cpp
+        src/database/config.cpp
+        src/database/pool.cpp
+        src/database/accessor.cpp
+        src/database/job.cpp src/utils/yaml_config.cpp)
 
 include(FindOpenSSL)
 find_package(OpenSSL REQUIRED)

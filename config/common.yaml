@@ -1,0 +1,11 @@
+thread:
+  socket_thread_count: 4
+
+network:
+  ping: # 단위: 초
+    interval: 30
+    timeout: 60
+
+security:
+  session:
+    packet_error_threshold: 32 # 연결을 끊을 패킷 예외 최대 횟수

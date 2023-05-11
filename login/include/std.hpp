@@ -5,11 +5,7 @@
 #ifndef STREET_HOMELESS_SERVER_STD_HPP
 #define STREET_HOMELESS_SERVER_STD_HPP
 
-#include <std_common.hpp>
-#include <thread/socket_thread_pool.hpp>
-#include <openssl/sha.h>
-#include <utils/hash.hpp>
-#include <utils/mysql_transaction.hpp>
+#include <homeless-common.hpp>
 #include "messages.pb.h"
 #include "account_data.pb.h"
 #include "login_result.pb.h"

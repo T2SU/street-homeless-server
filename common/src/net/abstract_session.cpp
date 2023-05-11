@@ -10,7 +10,7 @@
 
 static const char* close_reason_to_str(close_reason reason);
 
-hl::abstract_session::abstract_session(uint32_t id)
+hl::abstract_session::abstract_session(server* server, uint32_t id, uint32_t socket_sn)
     : _client({})
     , _active(true)
     , _closed(false)
@@ -20,9 +20,12 @@ hl::abstract_session::abstract_session(uint32_t id)
     , _read_buffer()
     , _write_jobs(10)
     , _id(id)
+    , _socket_sn(socket_sn)
     , _jobs()
     , _mutex()
     , _already_queued()
+    , _packet_error_count()
+    , _server(server)
 {
     _read_buffer.mode = read_mode::HEADER;
     LOGV << "Constructed session (" << __FUNCTION__ << ")";
@@ -66,6 +69,16 @@ std::string hl::abstract_session::get_remote_endpoint() const
 uint32_t hl::abstract_session::get_id() const
 {
     return _id;
+}
+
+uint32_t hl::abstract_session::get_socket_sn() const
+{
+    return _socket_sn;
+}
+
+bool hl::abstract_session::is_active() const
+{
+    return _active;
 }
 
 void hl::abstract_session::alloc_buffer_uv(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf)
@@ -176,6 +189,11 @@ void hl::abstract_session::do_socket_op()
                 catch (const std::exception& ex)
                 {
                     LOGE << "error on handling packet from (" << get_remote_endpoint() << "). dump=[" << job.in_buffer->dump_packet() << "]";
+                    if (++_packet_error_count >= 32)
+                    {
+                        LOGW << "too many packet error from (" << get_remote_endpoint() << "). disconnect session forcely.";
+                        close();
+                    }
                 }
                 break;
             }
@@ -199,6 +217,7 @@ void hl::abstract_session::do_socket_op()
                     _closed = true;
                     LOGV << this << "called on_close.  reason: " << close_reason_to_str(_closed_reason);
                     on_close(_closed_reason);
+                    _server->remove_from_connected(this);
                 }
                 else LOGV << this << "close event was fired, but already closed.";
                 break;
@@ -245,7 +264,6 @@ void hl::abstract_session::close(close_reason reason)
         LOGD << this << "requested closing session (reason: " << close_reason_to_str(reason) << "), but already not active.";
         return;
     }
-    _active = false;
     _closed_reason = reason;
     socket_job job{.op=socket_op::CLOSE, .close_reason=reason};
     enqueue_into_thread_pool(std::move(job));
@@ -260,7 +278,6 @@ void hl::abstract_session::enqueue_into_thread_pool(socket_job&& val)
     }
     singleton<socket_thread_pool>::get().get_worker_thread()->enqueue(this);
 }
-
 
 static const char* close_reason_to_str(close_reason reason)
 {

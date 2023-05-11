@@ -15,12 +15,13 @@
 #include "io/out_buffer.hpp"
 #include "memory/memory_pool.hpp"
 #include "socket_job.hpp"
+#include "server.hpp"
 
 namespace hl
 {
     class abstract_session {
     public:
-        explicit abstract_session(uint32_t id);
+        abstract_session(server* server, uint32_t id, uint32_t socket_sn);
         virtual ~abstract_session();
 
         abstract_session(const abstract_session&) = delete;
@@ -46,9 +47,11 @@ namespace hl
         read_buffer _read_buffer;
         std::list<std::shared_ptr<write_job>> _write_jobs;
         const uint32_t _id;
+        const uint32_t _socket_sn;
         std::queue<socket_job> _jobs;
         std::mutex _mutex;
         std::atomic_bool _already_queued;
+        size_t _packet_error_count;
 
         void init_remote_address();
 
@@ -63,6 +66,8 @@ namespace hl
         friend class socket_thread;
 
     protected:
+        server* _server;
+
         virtual void on_packet(in_buffer& in_buffer) = 0;
         virtual void on_close(close_reason reason) = 0;
 
@@ -70,6 +75,8 @@ namespace hl
         [[nodiscard]] std::string get_remote_address() const;
         [[nodiscard]] std::string get_remote_endpoint() const;
         [[nodiscard]] uint32_t get_id() const;
+        [[nodiscard]] uint32_t get_socket_sn() const;
+        [[nodiscard]] bool is_active() const;
 
         void close(close_reason reason = close_reason::server_close);
         void write(const out_buffer& out_buf);

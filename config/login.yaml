@@ -1,0 +1,8 @@
+network:
+  address: "0.0.0.0"
+  port: 7675
+
+session:
+  security:
+    max_login_retries: 5 # 세션당 최대 로그인 시도 횟수
+

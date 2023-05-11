@@ -11,25 +11,19 @@
 #pragma once
 #endif
 
-#include <net/abstract_session.hpp>
-
 namespace hl::login
 {
+    class login_server;
     class login_session : public abstract_session
     {
-    private:
-
     public:
-        explicit login_session(uint32_t id);
+        login_session(server* server, uint32_t id, uint32_t socket_sn);
 
         void on_packet(in_buffer& in_buffer) override;
         void on_close(close_reason reason) override;
         const char* get_type_name() const override;
 
-    private:
-        void on_check_alive_res(in_buffer& in_buf);
-        void on_login_req(in_buffer& in_buf);
-        void on_select_character_req(in_buffer& in_buf);
+        login_server& get_server();
     };
 }
 

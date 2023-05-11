@@ -26,6 +26,22 @@ namespace db
       };
       using _traits = sqlpp::make_traits<sqlpp::integer_unsigned, sqlpp::tag::must_not_insert, sqlpp::tag::must_not_update>;
     };
+    struct Uid
+    {
+      struct _alias_t
+      {
+        static constexpr const char _literal[] =  "uid";
+        using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
+        template<typename T>
+        struct _member_t
+          {
+            T uid;
+            T& operator()() { return uid; }
+            const T& operator()() const { return uid; }
+          };
+      };
+      using _traits = sqlpp::make_traits<sqlpp::integer_unsigned, sqlpp::tag::require_insert>;
+    };
     struct Name
     {
       struct _alias_t
@@ -158,6 +174,7 @@ namespace db
 
   struct Characters: sqlpp::table_t<Characters,
                Characters_::Pid,
+               Characters_::Uid,
                Characters_::Name,
                Characters_::Health,
                Characters_::Tiredness,
@@ -177,6 +194,93 @@ namespace db
         T characters;
         T& operator()() { return characters; }
         const T& operator()() const { return characters; }
+      };
+    };
+  };
+  namespace Inventory_
+  {
+    struct Sn
+    {
+      struct _alias_t
+      {
+        static constexpr const char _literal[] =  "sn";
+        using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
+        template<typename T>
+        struct _member_t
+          {
+            T sn;
+            T& operator()() { return sn; }
+            const T& operator()() const { return sn; }
+          };
+      };
+      using _traits = sqlpp::make_traits<sqlpp::integer_unsigned, sqlpp::tag::require_insert>;
+    };
+    struct Pid
+    {
+      struct _alias_t
+      {
+        static constexpr const char _literal[] =  "pid";
+        using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
+        template<typename T>
+        struct _member_t
+          {
+            T pid;
+            T& operator()() { return pid; }
+            const T& operator()() const { return pid; }
+          };
+      };
+      using _traits = sqlpp::make_traits<sqlpp::integer_unsigned, sqlpp::tag::require_insert>;
+    };
+    struct Itemid
+    {
+      struct _alias_t
+      {
+        static constexpr const char _literal[] =  "itemid";
+        using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
+        template<typename T>
+        struct _member_t
+          {
+            T itemid;
+            T& operator()() { return itemid; }
+            const T& operator()() const { return itemid; }
+          };
+      };
+      using _traits = sqlpp::make_traits<sqlpp::integer, sqlpp::tag::require_insert>;
+    };
+    struct Amount
+    {
+      struct _alias_t
+      {
+        static constexpr const char _literal[] =  "amount";
+        using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
+        template<typename T>
+        struct _member_t
+          {
+            T amount;
+            T& operator()() { return amount; }
+            const T& operator()() const { return amount; }
+          };
+      };
+      using _traits = sqlpp::make_traits<sqlpp::integer, sqlpp::tag::require_insert>;
+    };
+  } // namespace Inventory_
+
+  struct Inventory: sqlpp::table_t<Inventory,
+               Inventory_::Sn,
+               Inventory_::Pid,
+               Inventory_::Itemid,
+               Inventory_::Amount>
+  {
+    struct _alias_t
+    {
+      static constexpr const char _literal[] =  "inventory";
+      using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
+      template<typename T>
+      struct _member_t
+      {
+        T inventory;
+        T& operator()() { return inventory; }
+        const T& operator()() const { return inventory; }
       };
     };
   };
