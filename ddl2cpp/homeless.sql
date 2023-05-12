@@ -30,6 +30,18 @@ CREATE TABLE `characters` (
   `tiredness` int(11) NOT NULL,
   `max_health` int(11) NOT NULL,
   `max_tiredness` int(11) NOT NULL,
+  `hair` int(11) NOT NULL,
+  `hair_color` int(11) NOT NULL,
+  `shirt` int(11) NOT NULL,
+  `pants` int(11) NOT NULL,
+  `shoes` int(11) NOT NULL,
+  `hat` int(11) NOT NULL,
+  `beard` int(11) NOT NULL,
+  `gender` int(11) NOT NULL,
+  `fat` float NOT NULL,
+  `muscle` float NOT NULL,
+  `slimness` float NOT NULL,
+  `breast` float NOT NULL,
   `money` int(11) NOT NULL,
   `created` datetime NOT NULL DEFAULT current_timestamp(),
   `last_connected` datetime NOT NULL DEFAULT current_timestamp(),
@@ -38,7 +50,7 @@ CREATE TABLE `characters` (
   KEY `money` (`money`),
   KEY `uid` (`uid`),
   CONSTRAINT `FK_characters_users` FOREIGN KEY (`uid`) REFERENCES `users` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -47,6 +59,7 @@ CREATE TABLE `characters` (
 
 LOCK TABLES `characters` WRITE;
 /*!40000 ALTER TABLE `characters` DISABLE KEYS */;
+INSERT INTO `characters` VALUES (1,1,'김철남',100,0,100,100,0,0,0,0,0,0,0,0,0,0,0,0,860,'2023-05-12 03:17:43','2023-05-12 03:17:43');
 /*!40000 ALTER TABLE `characters` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -74,6 +87,7 @@ CREATE TABLE `inventory` (
 
 LOCK TABLES `inventory` WRITE;
 /*!40000 ALTER TABLE `inventory` DISABLE KEYS */;
+INSERT INTO `inventory` VALUES (1,1,40000000,10),(2,1,40000001,55),(3,1,30000000,3),(4,1,20000000,2);
 /*!40000 ALTER TABLE `inventory` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -105,7 +119,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'test','125d6d03b32c84d492747f79cf0bf6e179d287f341384eb5d6d3197525ad6be8e6df0116032935698f99a09e265073d1d6c32c274591bf1d0a20ad67cba921bc','test','2023-05-10 14:34:49','2023-05-10 14:34:47',NULL);
+INSERT INTO `users` VALUES (1,'test','125d6d03b32c84d492747f79cf0bf6e179d287f341384eb5d6d3197525ad6be8e6df0116032935698f99a09e265073d1d6c32c274591bf1d0a20ad67cba921bc','test','2023-05-10 14:34:49','2023-05-12 03:17:07',NULL);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -118,4 +132,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-05-12  3:16:54
+-- Dump completed on 2023-05-13  0:25:47

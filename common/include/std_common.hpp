@@ -27,12 +27,15 @@
 #include <format>
 #include <memory>
 #include <array>
+#include <streambuf>
 #include <exception>
 #include <unordered_set>
 #include <unordered_map>
 #include <type_traits>
 #include <algorithm>
 #include <mutex>
+#include <codecvt>
+#include <regex>
 #include <cstdio>
 #include <cstdlib>
 #include <filesystem>

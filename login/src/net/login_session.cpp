@@ -31,3 +31,13 @@ const char *hl::login::login_session::get_type_name() const
 {
     return "login_session";
 }
+
+const pb::AccountData &hl::login::login_session::get_account_data() const
+{
+    return _account_data;
+}
+
+void hl::login::login_session::set_account_data(pb::AccountData account_data)
+{
+    _account_data = std::move(account_data);
+}

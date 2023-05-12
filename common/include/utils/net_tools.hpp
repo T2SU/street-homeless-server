@@ -23,6 +23,8 @@ namespace hl
         net_tools& operator= (net_tools&&) = delete;
 
         static std::string dump_memory(const void* buffer, size_t len);
+        static size_t get_utf8_length(const std::string& str);
+        static bool check_regex(const std::string& str, const std::string& re);
     };
 }
 

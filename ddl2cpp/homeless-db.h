@@ -122,6 +122,198 @@ namespace db
       };
       using _traits = sqlpp::make_traits<sqlpp::integer, sqlpp::tag::require_insert>;
     };
+    struct Hair
+    {
+      struct _alias_t
+      {
+        static constexpr const char _literal[] =  "hair";
+        using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
+        template<typename T>
+        struct _member_t
+          {
+            T hair;
+            T& operator()() { return hair; }
+            const T& operator()() const { return hair; }
+          };
+      };
+      using _traits = sqlpp::make_traits<sqlpp::integer, sqlpp::tag::require_insert>;
+    };
+    struct HairColor
+    {
+      struct _alias_t
+      {
+        static constexpr const char _literal[] =  "hair_color";
+        using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
+        template<typename T>
+        struct _member_t
+          {
+            T hairColor;
+            T& operator()() { return hairColor; }
+            const T& operator()() const { return hairColor; }
+          };
+      };
+      using _traits = sqlpp::make_traits<sqlpp::integer, sqlpp::tag::require_insert>;
+    };
+    struct Shirt
+    {
+      struct _alias_t
+      {
+        static constexpr const char _literal[] =  "shirt";
+        using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
+        template<typename T>
+        struct _member_t
+          {
+            T shirt;
+            T& operator()() { return shirt; }
+            const T& operator()() const { return shirt; }
+          };
+      };
+      using _traits = sqlpp::make_traits<sqlpp::integer, sqlpp::tag::require_insert>;
+    };
+    struct Pants
+    {
+      struct _alias_t
+      {
+        static constexpr const char _literal[] =  "pants";
+        using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
+        template<typename T>
+        struct _member_t
+          {
+            T pants;
+            T& operator()() { return pants; }
+            const T& operator()() const { return pants; }
+          };
+      };
+      using _traits = sqlpp::make_traits<sqlpp::integer, sqlpp::tag::require_insert>;
+    };
+    struct Shoes
+    {
+      struct _alias_t
+      {
+        static constexpr const char _literal[] =  "shoes";
+        using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
+        template<typename T>
+        struct _member_t
+          {
+            T shoes;
+            T& operator()() { return shoes; }
+            const T& operator()() const { return shoes; }
+          };
+      };
+      using _traits = sqlpp::make_traits<sqlpp::integer, sqlpp::tag::require_insert>;
+    };
+    struct Hat
+    {
+      struct _alias_t
+      {
+        static constexpr const char _literal[] =  "hat";
+        using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
+        template<typename T>
+        struct _member_t
+          {
+            T hat;
+            T& operator()() { return hat; }
+            const T& operator()() const { return hat; }
+          };
+      };
+      using _traits = sqlpp::make_traits<sqlpp::integer, sqlpp::tag::require_insert>;
+    };
+    struct Beard
+    {
+      struct _alias_t
+      {
+        static constexpr const char _literal[] =  "beard";
+        using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
+        template<typename T>
+        struct _member_t
+          {
+            T beard;
+            T& operator()() { return beard; }
+            const T& operator()() const { return beard; }
+          };
+      };
+      using _traits = sqlpp::make_traits<sqlpp::integer, sqlpp::tag::require_insert>;
+    };
+    struct Gender
+    {
+      struct _alias_t
+      {
+        static constexpr const char _literal[] =  "gender";
+        using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
+        template<typename T>
+        struct _member_t
+          {
+            T gender;
+            T& operator()() { return gender; }
+            const T& operator()() const { return gender; }
+          };
+      };
+      using _traits = sqlpp::make_traits<sqlpp::integer, sqlpp::tag::require_insert>;
+    };
+    struct Fat
+    {
+      struct _alias_t
+      {
+        static constexpr const char _literal[] =  "fat";
+        using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
+        template<typename T>
+        struct _member_t
+          {
+            T fat;
+            T& operator()() { return fat; }
+            const T& operator()() const { return fat; }
+          };
+      };
+      using _traits = sqlpp::make_traits<sqlpp::floating_point, sqlpp::tag::require_insert>;
+    };
+    struct Muscle
+    {
+      struct _alias_t
+      {
+        static constexpr const char _literal[] =  "muscle";
+        using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
+        template<typename T>
+        struct _member_t
+          {
+            T muscle;
+            T& operator()() { return muscle; }
+            const T& operator()() const { return muscle; }
+          };
+      };
+      using _traits = sqlpp::make_traits<sqlpp::floating_point, sqlpp::tag::require_insert>;
+    };
+    struct Slimness
+    {
+      struct _alias_t
+      {
+        static constexpr const char _literal[] =  "slimness";
+        using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
+        template<typename T>
+        struct _member_t
+          {
+            T slimness;
+            T& operator()() { return slimness; }
+            const T& operator()() const { return slimness; }
+          };
+      };
+      using _traits = sqlpp::make_traits<sqlpp::floating_point, sqlpp::tag::require_insert>;
+    };
+    struct Breast
+    {
+      struct _alias_t
+      {
+        static constexpr const char _literal[] =  "breast";
+        using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
+        template<typename T>
+        struct _member_t
+          {
+            T breast;
+            T& operator()() { return breast; }
+            const T& operator()() const { return breast; }
+          };
+      };
+      using _traits = sqlpp::make_traits<sqlpp::floating_point, sqlpp::tag::require_insert>;
+    };
     struct Money
     {
       struct _alias_t
@@ -180,6 +372,18 @@ namespace db
                Characters_::Tiredness,
                Characters_::MaxHealth,
                Characters_::MaxTiredness,
+               Characters_::Hair,
+               Characters_::HairColor,
+               Characters_::Shirt,
+               Characters_::Pants,
+               Characters_::Shoes,
+               Characters_::Hat,
+               Characters_::Beard,
+               Characters_::Gender,
+               Characters_::Fat,
+               Characters_::Muscle,
+               Characters_::Slimness,
+               Characters_::Breast,
                Characters_::Money,
                Characters_::Created,
                Characters_::LastConnected>

@@ -8,7 +8,7 @@
 #[[#include]]# "net/login_server.hpp"
 #[[#include]]# <net/packet_handler.hpp>
 
-namespace hl::login::handler
+namespace hl::login::handlers
 {
     struct ${NAME} : public hl::packet_handler<login_session>
     {

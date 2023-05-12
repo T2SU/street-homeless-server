@@ -15,6 +15,20 @@
 #include "net/network_exceptions.hpp"
 #include "utils/net_tools.hpp"
 
+/* https://stackoverflow.com/a/13059195 (Dietmar Kühl) (CC BY-SA 3.0) */
+struct membuf: std::streambuf {
+    membuf(char const* base, size_t size) {
+        char* p(const_cast<char*>(base));
+        this->setg(p, p, p + size);
+    }
+};
+struct imemstream: virtual membuf, std::istream {
+    imemstream(char const* base, size_t size)
+            : membuf(base, size)
+            , std::istream(static_cast<std::streambuf*>(this)) {
+    }
+};
+
 template<typename Ty> requires NetworkSize<Ty>
 class basic_in_buffer {
 private:
@@ -77,10 +91,8 @@ public:
     template<typename T>
     void read_pb(T& protobuf)
     {
-        size_t len = protobuf.ByteSizeLong();
-        if (_offset + len > get_raw_buffer_size())
-            throw end_of_stream_exception();
-        protobuf.ParseFromArray(reinterpret_cast<void*>(&_buffer[_offset]), len);
+        protobuf.ParseFromArray(&_buffer[_offset], remaining());
+        _offset += protobuf.ByteSizeLong();
     }
 
     [[nodiscard]]
@@ -99,6 +111,13 @@ public:
     size_t get_raw_buffer_size() const
     {
         return _buffer.size();
+    }
+
+    [[nodiscard]]
+    size_t remaining() const
+    {
+        if (_buffer.size() < _offset) return 0;
+        return _buffer.size() - _offset;
     }
 };
 

@@ -132,10 +132,7 @@ namespace hl
             i = _session_pool.front();
             _session_pool.pop();
             session = &_sessions[i];
-        }
-        std::allocator_traits<decltype(_allocator)>::construct(_allocator, session, this, i, ++_session_sn_counter);
-        synchronized (_mutex)
-        {
+            std::allocator_traits<decltype(_allocator)>::construct(_allocator, session, this, i, ++_session_sn_counter);
             _connected_sessions[session->get_socket_sn()] = std::shared_ptr<SessTy>(session, [this](SessTy* session) {
                 release_session(session);
             });

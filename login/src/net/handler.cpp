@@ -7,13 +7,15 @@
 #include "handlers/check_alive_res.hpp"
 #include "handlers/login_req.hpp"
 #include "handlers/select_character_req.hpp"
+#include "handlers/create_character_req.hpp"
 
 hl::login::handler::handler()
     : _handlers()
 {
-    _handlers[pb::ClientMessage::CheckAliveRes] = std::make_unique<hl::login::handlers::check_alive_res>();
-    _handlers[pb::ClientMessage::LoginReq] = std::make_unique<hl::login::handlers::login_req>();
-    _handlers[pb::ClientMessage::SelectCharacterReq] = std::make_unique<hl::login::handlers::select_character_req>();
+    _handlers[pb::ClientMessage_CheckAliveRes] = std::make_unique<hl::login::handlers::check_alive_res>();
+    _handlers[pb::ClientMessage_LoginReq] = std::make_unique<hl::login::handlers::login_req>();
+    _handlers[pb::ClientMessage_CreateCharacterReq] = std::make_unique<hl::login::handlers::create_character_req>();
+    _handlers[pb::ClientMessage_SelectCharacterReq] = std::make_unique<hl::login::handlers::select_character_req>();
 }
 
 void hl::login::handler::process(hl::login::login_session &session, in_buffer &in_buf)

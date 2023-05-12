@@ -25,7 +25,7 @@ public:
              return;
 
         namespace sql = sqlpp::mysql;
-        out_buffer out_buf(pb::ServerMessage::LoginRes);
+        out_buffer out_buf(pb::ServerMessage_LoginRes);
 
         try
         {
@@ -49,37 +49,38 @@ public:
                             conn(sql::update(user).set(user.lastConnected = std::chrono::system_clock::now()).where(user.uid == row.uid));
 
                             pb::AccountData account_data;
-                            out_buf.write<uint8_t>(pb::LoginResult::Success);
+                            out_buf.write<uint8_t>(pb::LoginResult_Success);
                             account_data.set_uid(row.uid);
                             account_data.set_name(row.name);
                             out_buf.write_pb(account_data);
+                            session->set_account_data(account_data);
                         }
                         catch (const std::exception& ex)
                         {
                             LOGE << "sql error " << ex.what();
-                            out_buf.write<uint8_t>(pb::LoginResult::DatabaseError);
+                            out_buf.write<uint8_t>(pb::LoginResult_DatabaseError);
                         }
                     }
                     else
                     {
-                        out_buf.write<uint8_t>(pb::LoginResult::AlreadyConnected); // 이미 접속중
+                        out_buf.write<uint8_t>(pb::LoginResult_AlreadyConnected); // 이미 접속중
                     }
                 }
                 else
                 {
-                    out_buf.write<uint8_t>(pb::LoginResult::InvalidPassword); // 잘못된 패스워드
+                    out_buf.write<uint8_t>(pb::LoginResult_InvalidPassword); // 잘못된 패스워드
                 }
             }
             else
             {
-                out_buf.write<uint8_t>(pb::LoginResult::InvalidAccount); // 잘못된 계정
+                out_buf.write<uint8_t>(pb::LoginResult_InvalidAccount); // 잘못된 계정
             }
             tx.commit();
         }
         catch (const sqlpp::exception& e)
         {
             LOGE << "sql error " << e.what();
-            out_buf.write<uint8_t>(pb::LoginResult::DatabaseError);
+            out_buf.write<uint8_t>(pb::LoginResult_DatabaseError);
         }
         session->write(out_buf);
     }

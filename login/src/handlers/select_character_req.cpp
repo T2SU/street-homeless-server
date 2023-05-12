@@ -56,7 +56,7 @@ public:
         playerData.set_name("김철남");
         playerData.set_pid(1000);
 
-        out_buffer out_buf(pb::ServerMessage::EnterGameWorldRes);
+        out_buffer out_buf(pb::ServerMessage_EnterGameWorldRes);
         out_buf.write_pb(playerData);
         session->write(out_buf);
 
