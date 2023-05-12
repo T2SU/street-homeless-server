@@ -22,6 +22,8 @@ public:
         if (!hl::singleton<hl::login::login_server>::get().try_get(_socket_sn, session))
             return;
 
+
+
         pb::PlayerData playerData;
         pb::PlayerStat playerStat;
         pb::Inventory inventory;
@@ -54,9 +56,9 @@ public:
         playerData.set_name("김철남");
         playerData.set_pid(1000);
 
-        out_buffer out_buf(pb::ServerMessage::SetStage);
+        out_buffer out_buf(pb::ServerMessage::EnterGameWorldRes);
         out_buf.write_pb(playerData);
-        session.write(out_buf);
+        session->write(out_buf);
 
         playerData.release_inventory();
         playerData.release_stat();

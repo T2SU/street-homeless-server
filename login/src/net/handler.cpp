@@ -25,5 +25,6 @@ void hl::login::handler::process(hl::login::login_session &session, in_buffer &i
         throw std::runtime_error("Unknown packet type " + std::to_string(packet));
     }
 
-    _handlers[packet]->handle_packet(session, in_buf);
+    if (_handlers[packet])
+        _handlers[packet]->handle_packet(session, in_buf);
 }
