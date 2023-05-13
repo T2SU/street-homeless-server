@@ -91,8 +91,11 @@ public:
     template<typename T>
     void read_pb(T& protobuf)
     {
-        protobuf.ParseFromArray(&_buffer[_offset], remaining());
-        _offset += protobuf.ByteSizeLong();
+        const auto len = read<uint16_t>();
+        if (_offset + len > get_raw_buffer_size())
+            throw end_of_stream_exception();
+        protobuf.ParseFromArray(&_buffer[_offset], len);
+        _offset += len;
     }
 
     [[nodiscard]]

@@ -14,6 +14,9 @@
 #include "inventory.pb.h"
 #include "player_appearance.pb.h"
 #include "create_character_result.pb.h"
+#include "character_list_result.pb.h"
+#include "select_character_result.pb.h"
+#include "delete_character_result.pb.h"
 #include "homeless-db.h"
 
 #endif //STREET_HOMELESS_SERVER_STD_HPP

@@ -13,12 +13,10 @@ hl::login::login_session::login_session(server* server, uint32_t id, uint32_t so
 
 void hl::login::login_session::on_close(close_reason reason)
 {
-    LOGI << this << "on close login session.";
 }
 
 void hl::login::login_session::on_packet(in_buffer &in_buffer)
 {
-    LOGI << this << "on packet login session.";
     hl::singleton<hl::login::handler>::get().process(*this, in_buffer);
 }
 

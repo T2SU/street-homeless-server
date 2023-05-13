@@ -6,7 +6,7 @@
 #include "std.hpp"
 #include "handlers/select_character_req.hpp"
 
-class select_character_job : hl::database::job
+class select_character_job : public hl::database::job
 {
 private:
     const uint32_t _socket_sn;
@@ -22,50 +22,47 @@ public:
         if (!hl::singleton<hl::login::login_server>::get().try_get(_socket_sn, session))
             return;
 
+        out_buffer out_buf(pb::ServerMessage_SelectCharacterRes);
 
-
-        pb::PlayerData playerData;
-        pb::PlayerStat playerStat;
-        pb::Inventory inventory;
-
-        playerStat.set_health(100);
-        playerStat.set_tiredness(0);
-        playerStat.set_max_health(100);
-        playerStat.set_max_tiredness(100);
-
-        inventory.set_money(860);
-        const std::vector<std::pair<int ,int>> test_items(
-                {
-                        {40000000, 10}, // 박스떼기
-                        {40000001, 54}, // 노숙일보
-                        {30000000, 3}, // 뚜껑없는 깡통
-                        {20000000, 1}, // LPG(소)
-                });
-
-        auto sn = 0;
-        for (const auto& test_item : test_items)
+        try
         {
-            auto i = inventory.add_items();
-            i->set_sn(sn++);
-            i->set_item_id(test_item.first);
-            i->set_amount(test_item.second);
+            if (session->get_account_data().uid() == 0)
+                throw std::runtime_error("no session uid");
+
+            db::Characters chr{};
+
+            auto tx = hl::mysql::start_transaction(conn, sqlpp::isolation_level::repeatable_read);
+            const auto u = conn(update(chr)
+                    .set(chr.lastConnected = std::chrono::system_clock::now())
+                    .where(chr.pid == _pid and chr.uid == session->get_account_data().uid()));
+            if (u == 0)
+            {
+                out_buf.write<uint8_t>(pb::SelectCharacterResult_NoCharacter);
+            }
+            else
+            {
+                out_buf.write<uint8_t>(pb::SelectCharacterResult_Success);
+            }
+        }
+        catch (const sqlpp::exception& sqlex)
+        {
+            LOGE << "sql error " << sqlex.what();
+            out_buf.write<uint8_t>(pb::SelectCharacterResult_DatabaseError);
+        }
+        catch (const std::exception& ex)
+        {
+            out_buf.write<uint8_t>(pb::SelectCharacterResult_UnknownError);
+            session->write(out_buf);
+            throw ex;
         }
 
-        playerData.set_allocated_inventory(&inventory);
-        playerData.set_allocated_stat(&playerStat);
-        playerData.set_name("김철남");
-        playerData.set_pid(1000);
-
-        out_buffer out_buf(pb::ServerMessage_EnterGameWorldRes);
-        out_buf.write_pb(playerData);
         session->write(out_buf);
-
-        playerData.release_inventory();
-        playerData.release_stat();
     }
 };
 
 void hl::login::handlers::select_character_req::handle_packet(login_session &session, in_buffer &in_buf)
 {
-
+    if (session.get_account_data().uid() == 0)
+        throw std::runtime_error("no session uid");
+    session.get_server().accessor().post<select_character_job>(session.get_socket_sn(), in_buf.read<uint64_t>());
 }

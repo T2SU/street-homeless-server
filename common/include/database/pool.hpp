@@ -30,7 +30,9 @@ namespace hl::database
 
         proxy_connection(connection_pool<Conn> *pool, Conn *conn) noexcept
                 : _pool(pool), _conn(conn)
-        {}
+        {
+            LOGV << "created pool connection";
+        }
 
         connection_pool<Conn> *_pool;
         Conn *_conn;
@@ -52,6 +54,7 @@ namespace hl::database
 
         ~proxy_connection()
         {
+            LOGV << "releasing pool connection";
             _pool->release(*this);
         }
 
