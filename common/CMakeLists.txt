@@ -15,7 +15,7 @@ add_library(HomelessCommon STATIC
         src/database/config.cpp
         src/database/pool.cpp
         src/database/accessor.cpp
-        src/database/job.cpp src/utils/yaml_config.cpp)
+        src/database/job.cpp src/utils/yaml_config.cpp src/net/connector.cpp)
 
 include(FindOpenSSL)
 find_package(OpenSSL REQUIRED)

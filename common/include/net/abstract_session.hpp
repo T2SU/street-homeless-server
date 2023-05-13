@@ -65,6 +65,7 @@ namespace hl
 
         friend class socket_thread;
 
+
     protected:
         server* _server;
 
@@ -83,8 +84,17 @@ namespace hl
 
         virtual const char* get_type_name() const = 0;
 
+        void init_connect(uv_loop_t* loop)
+        {
+            auto stream = reinterpret_cast<uv_stream_t*>(&_client);
+            uv_tcp_init(loop, &_client);
+            _client.data = this;
+            init_remote_address();
+            uv_read_start(stream, alloc_buffer_uv, on_read_uv);
+        }
+
         template<typename Serv, typename SessTy> requires std::is_convertible_v<SessTy*, abstract_session*>
-        void init(uv_loop_t* loop, uv_stream_t* server, Serv* serv, SessTy*)
+        void init_accept(uv_loop_t* loop, uv_stream_t* server, Serv* serv, SessTy*)
         {
             auto stream = reinterpret_cast<uv_stream_t*>(&_client);
             uv_tcp_init(loop, &_client);
@@ -111,6 +121,10 @@ namespace hl
     {
         return operator<<(os, *sess);
     }
+
+    template<typename SessTy>
+    concept SessionType = std::is_base_of_v<abstract_session, SessTy> && !std::is_same_v<abstract_session, SessTy>;
 }
+
 
 #endif //STREET_HOMELESS_SERVER_ABSTRACT_SESSION_HPP

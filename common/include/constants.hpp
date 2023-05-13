@@ -16,5 +16,7 @@ constexpr uint32_t MaxSession = 500;
 constexpr int32_t DefaultBacklog = 50;
 
 enum class close_reason { server_close, connection_reset, gracefully_shutdown, exception, unknown };
+enum class server_type { game, login };
+enum game_server_flag : uint32_t { game_field = 1 << 0, game_instance = 1 << 1 };
 
 #endif //STREET_HOMELESS_SERVER_CONSTANTS_HPP

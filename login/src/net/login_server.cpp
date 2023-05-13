@@ -5,8 +5,6 @@
 #include "std.hpp"
 #include "net/login_server.hpp"
 
-using namespace std::chrono_literals;
-
 void hl::login::login_server::on_accept(hl::login::login_session *session)
 {
     LOGI << "Accepted login session from [" << session->get_remote_endpoint() << "]";
@@ -14,5 +12,5 @@ void hl::login::login_server::on_accept(hl::login::login_session *session)
 
 hl::database::accessor &hl::login::login_server::accessor()
 {
-    return _accessor;
+    return *_accessor[(_accessor_robin++) % _accessor_count];
 }

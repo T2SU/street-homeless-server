@@ -11,6 +11,7 @@
 #pragma once
 #endif
 
+#include "net/connector.hpp"
 #include "net/abstract_server.hpp"
 #include "net/abstract_session.hpp"
 #include "net/network_exceptions.hpp"

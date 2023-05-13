@@ -1,11 +1,18 @@
+thread:
+  db_accessor_count: 4
+
 network:
   login:
     bind:
       address: "0.0.0.0"
       port: 7675
   inter_server:
-    redis_host: "127.0.0.1"
-    redis_port: 6379
+    master_host: "127.0.0.1"
+    master_port: 6766
+
+config:
+  login:
+    index: 0
 
 session:
   security:

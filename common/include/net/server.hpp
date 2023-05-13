@@ -20,7 +20,6 @@ namespace hl
     {
     public:
         virtual void remove_from_connected(abstract_session* session) = 0;
-        virtual void release_session(abstract_session *session) = 0;
     };
 }
 

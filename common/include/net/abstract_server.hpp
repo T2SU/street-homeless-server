@@ -17,9 +17,6 @@
 
 namespace hl
 {
-    template<typename SessTy>
-    concept SessionType = std::is_base_of_v<abstract_session, SessTy> && !std::is_same_v<abstract_session, SessTy>;
-
     template<SessionType SessTy>
     class abstract_server : public server
     {
@@ -51,7 +48,7 @@ namespace hl
         void broadcast(const out_buffer& out_buf);
 
         void remove_from_connected(abstract_session* session) override;
-        void release_session(abstract_session* session) override;
+        void release_session(abstract_session* session);
         bool try_get(uint32_t socket_sn, std::shared_ptr<SessTy>& ptr);
 
         void begin(const std::string& bind_address, uint16_t bind_port);
@@ -207,7 +204,7 @@ namespace hl
     {
         auto $this = reinterpret_cast<abstract_server<SessTy>*>(server->data);
         auto session = $this->acquire_session();
-        session->init($this->_loop, server, $this, session);
+        session->init_accept($this->_loop, server, $this, session);
     }
 }
 #endif //STREET_HOMELESS_SERVER_ABSTRACT_SERVER_HPP

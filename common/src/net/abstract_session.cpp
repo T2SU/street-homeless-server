@@ -217,7 +217,8 @@ void hl::abstract_session::do_socket_op()
                     _closed = true;
                     LOGV << this << "called on_close.  reason: " << close_reason_to_str(_closed_reason);
                     on_close(_closed_reason);
-                    _server->remove_from_connected(this);
+                    if (_server)
+                        _server->remove_from_connected(this);
                 }
                 else LOGV << this << "close event was fired, but already closed.";
                 break;

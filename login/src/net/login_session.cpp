@@ -5,7 +5,7 @@
 #include "std.hpp"
 #include "net/login_session.hpp"
 #include "net/login_server.hpp"
-#include "net/handler.hpp"
+#include "net/login_handler.hpp"
 
 hl::login::login_session::login_session(server* server, uint32_t id, uint32_t socket_sn)
         : abstract_session(server, id, socket_sn)
@@ -17,7 +17,7 @@ void hl::login::login_session::on_close(close_reason reason)
 
 void hl::login::login_session::on_packet(in_buffer &in_buffer)
 {
-    hl::singleton<hl::login::handler>::get().process(*this, in_buffer);
+    hl::singleton<hl::login::login_handler>::get().process(*this, in_buffer);
 }
 
 hl::login::login_server &hl::login::login_session::get_server()

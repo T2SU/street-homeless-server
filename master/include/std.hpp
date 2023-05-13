@@ -11,6 +11,7 @@
 #pragma once
 #endif
 
-#include <std_common.hpp>
+#include <homeless-common.hpp>
+#include "homeless-db.h"
 
 #endif //STREET_HOMELESS_SERVER_STD_HPP
