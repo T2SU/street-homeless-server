@@ -1,0 +1,13 @@
+network:
+  game0:
+    bind:
+      address: "0.0.0.0"
+      port: 7676
+  inter_server:
+    redis_host: "127.0.0.1"
+    redis_port: 6379
+
+config:
+  game:
+    type:
+      - "field" # "field" or "instance"

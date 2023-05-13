@@ -180,6 +180,9 @@ namespace hl
     template<SessionType SessTy>
     void abstract_server<SessTy>::begin(const std::string& bind_address, uint16_t bind_port)
     {
+#ifndef _WIN32
+        signal(SIGPIPE, SIG_IGN);
+#endif
         uv_ip4_addr(bind_address.c_str(), bind_port, &_addr);
         _server.data = this;
         const auto bind_res = uv_tcp_bind(&_server, reinterpret_cast<const struct sockaddr*>(&_addr), 0);

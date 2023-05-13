@@ -1,8 +1,12 @@
 network:
-  address: "0.0.0.0"
-  port: 7675
+  login:
+    bind:
+      address: "0.0.0.0"
+      port: 7675
+  inter_server:
+    redis_host: "127.0.0.1"
+    redis_port: 6379
 
 session:
   security:
     max_login_retries: 5 # 세션당 최대 로그인 시도 횟수
-

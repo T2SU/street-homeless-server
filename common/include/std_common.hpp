@@ -36,6 +36,7 @@
 #include <mutex>
 #include <codecvt>
 #include <regex>
+#include <csignal>
 #include <cstdio>
 #include <cstdlib>
 #include <filesystem>
