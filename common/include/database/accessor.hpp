@@ -22,6 +22,9 @@ namespace hl::database
         std::condition_variable _cv;
         std::queue<std::shared_ptr<job>> _waiting_jobs;
         std::atomic_bool _stop;
+        std::thread _thread;
+        std::vector<std::shared_ptr<job>> _jobs;
+
 
     public:
         accessor();

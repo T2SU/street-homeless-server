@@ -13,11 +13,6 @@ void hl::socket_thread_pool::begin(uint32_t threads)
 {
     for (auto i = 0u; i < threads; ++i)
         _threads.emplace_back(std::make_shared<hl::socket_thread>(i));
-    for (const auto& thread_ptr : _threads)
-    {
-        std::thread th(hl::socket_thread::run, thread_ptr.get());
-        th.detach();
-    }
     LOGD << "Started " << _threads.size() << " socket threads";
 }
 

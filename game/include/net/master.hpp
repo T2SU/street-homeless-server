@@ -21,6 +21,7 @@ namespace hl::game
         void on_packet(in_buffer& in_buffer) override;
         void on_close(close_reason reason) override;
         const char* get_type_name() const override;
+        void on_connect() override;
     };
 }
 

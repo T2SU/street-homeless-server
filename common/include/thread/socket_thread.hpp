@@ -24,6 +24,7 @@ namespace hl
         std::mutex _mutex;
         std::atomic_bool _alive;
         std::deque<abstract_session*> _queued_sessions;
+        std::thread _thread;
 
     public:
         explicit socket_thread(uint32_t id);
@@ -32,7 +33,7 @@ namespace hl
         void enqueue(abstract_session* session);
         void stop();
 
-        static void run(socket_thread* inst);
+        void run();
     };
 }
 

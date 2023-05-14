@@ -56,6 +56,15 @@ void hl::abstract_session::init_remote_address()
     _remote_endpoint = std::format("{}:{}", result, port);
 }
 
+void hl::abstract_session::init_connect()
+{
+    auto stream = reinterpret_cast<uv_stream_t*>(&_client);
+    _client.data = this;
+    init_remote_address();
+    on_connect();
+    uv_read_start(stream, alloc_buffer_uv, on_read_uv);
+}
+
 std::string hl::abstract_session::get_remote_address() const
 {
     return _remote_address;
@@ -74,6 +83,11 @@ uint32_t hl::abstract_session::get_id() const
 uint32_t hl::abstract_session::get_socket_sn() const
 {
     return _socket_sn;
+}
+
+uv_tcp_t* hl::abstract_session::get_handle()
+{
+    return &_client;
 }
 
 bool hl::abstract_session::is_active() const
@@ -189,7 +203,7 @@ void hl::abstract_session::do_socket_op()
                 catch (const std::exception& ex)
                 {
                     LOGE << "error on handling packet from (" << get_remote_endpoint() << "). dump=[" << job.in_buffer->dump_packet() << "]";
-                    if (++_packet_error_count >= 32)
+                    if (++_packet_error_count >= _server->get_packet_error_threshold())
                     {
                         LOGW << "too many packet error from (" << get_remote_endpoint() << "). disconnect session forcely.";
                         close();
@@ -279,6 +293,8 @@ void hl::abstract_session::enqueue_into_thread_pool(socket_job&& val)
     }
     singleton<socket_thread_pool>::get().get_worker_thread()->enqueue(this);
 }
+
+void hl::abstract_session::on_connect() {}
 
 static const char* close_reason_to_str(close_reason reason)
 {

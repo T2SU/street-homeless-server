@@ -21,6 +21,8 @@ namespace hl::master
         uint32_t _idx;
         uint32_t _game_flag;
         bool _setup;
+        std::string _endpoint_address;
+        uint16_t _endpoint_port;
 
     public:
         master_session(server* server, uint32_t id, uint32_t socket_sn);
@@ -29,8 +31,16 @@ namespace hl::master
         void on_close(close_reason reason) override;
         const char* get_type_name() const override;
 
-        bool is_setup() const;
+        inline auto is_setup() const { return _setup; }
+        inline auto get_server_type() const { return _type; }
+        inline auto get_idx() const { return _idx; }
+        inline auto get_game_flag() const { return _game_flag; }
+        inline auto get_endpoint_address() const { return _endpoint_address; }
+        inline auto get_endpoint_port() const { return _endpoint_port; }
+
         void set_server_type(server_type type, uint32_t idx, uint32_t game_flag);
+        void set_endpoint(std::string address, uint16_t port);
+
 
         master_server& get_server();
     };

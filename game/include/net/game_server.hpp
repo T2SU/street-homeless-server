@@ -18,13 +18,18 @@ namespace hl::game
     class game_server : public abstract_server<game_session>
     {
     private:
+        std::string _endpoint_address;
+        uint16_t _endpoint_port;
+        uint32_t _idx;
+        game_server_flag _flag;
 
     public:
-        game_server() : abstract_server()
-        {
-        }
+        game_server();
 
         void on_accept(game_session* session) override;
+        void set_endpoint(std::string address, uint16_t port);
+        void set_server_config(uint32_t idx, game_server_flag flag);
+        void encode_config(out_buffer& obuf);
     };
 }
 

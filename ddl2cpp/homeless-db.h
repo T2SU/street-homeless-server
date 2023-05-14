@@ -250,6 +250,38 @@ namespace db
       };
       using _traits = sqlpp::make_traits<sqlpp::integer, sqlpp::tag::require_insert>;
     };
+    struct Map
+    {
+      struct _alias_t
+      {
+        static constexpr const char _literal[] =  "map";
+        using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
+        template<typename T>
+        struct _member_t
+          {
+            T map;
+            T& operator()() { return map; }
+            const T& operator()() const { return map; }
+          };
+      };
+      using _traits = sqlpp::make_traits<sqlpp::text>;
+    };
+    struct StartingPoint
+    {
+      struct _alias_t
+      {
+        static constexpr const char _literal[] =  "starting_point";
+        using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
+        template<typename T>
+        struct _member_t
+          {
+            T startingPoint;
+            T& operator()() { return startingPoint; }
+            const T& operator()() const { return startingPoint; }
+          };
+      };
+      using _traits = sqlpp::make_traits<sqlpp::text>;
+    };
     struct Fat
     {
       struct _alias_t
@@ -380,6 +412,8 @@ namespace db
                Characters_::Hat,
                Characters_::Beard,
                Characters_::Gender,
+               Characters_::Map,
+               Characters_::StartingPoint,
                Characters_::Fat,
                Characters_::Muscle,
                Characters_::Slimness,
@@ -602,6 +636,22 @@ namespace db
       };
       using _traits = sqlpp::make_traits<sqlpp::text, sqlpp::tag::can_be_null>;
     };
+    struct DeviceId
+    {
+      struct _alias_t
+      {
+        static constexpr const char _literal[] =  "device_id";
+        using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
+        template<typename T>
+        struct _member_t
+          {
+            T deviceId;
+            T& operator()() { return deviceId; }
+            const T& operator()() const { return deviceId; }
+          };
+      };
+      using _traits = sqlpp::make_traits<sqlpp::text, sqlpp::tag::can_be_null>;
+    };
   } // namespace Users_
 
   struct Users: sqlpp::table_t<Users,
@@ -611,7 +661,8 @@ namespace db
                Users_::Salt,
                Users_::Created,
                Users_::LastConnected,
-               Users_::SessionIp>
+               Users_::SessionIp,
+               Users_::DeviceId>
   {
     struct _alias_t
     {

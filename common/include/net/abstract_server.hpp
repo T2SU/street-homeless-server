@@ -44,6 +44,7 @@ namespace hl
         abstract_server();
         virtual ~abstract_server();
 
+        int32_t get_packet_error_threshold() const override;
         size_t get_connection_num() const;
         void broadcast(const out_buffer& out_buf);
 
@@ -100,6 +101,12 @@ namespace hl
         {
             return MaxSession - _session_pool.size();
         }
+    }
+
+    template<SessionType SessTy>
+    int32_t abstract_server<SessTy>::get_packet_error_threshold() const
+    {
+        return _packet_error_threshold;
     }
 
     template<SessionType SessTy>

@@ -20,6 +20,7 @@ namespace hl
     {
     public:
         virtual void remove_from_connected(abstract_session* session) = 0;
+        virtual int32_t get_packet_error_threshold() const = 0;
     };
 }
 

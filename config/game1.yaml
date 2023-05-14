@@ -2,7 +2,10 @@ network:
   game1:
     bind:
       address: "0.0.0.0"
-      port: 7677
+      port: 7676
+    endpoint:
+      address: "192.168.1.128"
+      port: 7676
   inter_server:
     master_host: "127.0.0.1"
     master_port: 6766
@@ -11,4 +14,4 @@ config:
   game:
     index: 1
     type:
-      - "instance" # "field" or "instance"
+      - "field" # "field" or "instance"

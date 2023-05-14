@@ -77,6 +77,7 @@ namespace hl
         [[nodiscard]] std::string get_remote_endpoint() const;
         [[nodiscard]] uint32_t get_id() const;
         [[nodiscard]] uint32_t get_socket_sn() const;
+        [[nodiscard]] uv_tcp_t* get_handle();
         [[nodiscard]] bool is_active() const;
 
         void close(close_reason reason = close_reason::server_close);
@@ -84,14 +85,8 @@ namespace hl
 
         virtual const char* get_type_name() const = 0;
 
-        void init_connect(uv_loop_t* loop)
-        {
-            auto stream = reinterpret_cast<uv_stream_t*>(&_client);
-            uv_tcp_init(loop, &_client);
-            _client.data = this;
-            init_remote_address();
-            uv_read_start(stream, alloc_buffer_uv, on_read_uv);
-        }
+        void init_connect();
+        virtual void on_connect();
 
         template<typename Serv, typename SessTy> requires std::is_convertible_v<SessTy*, abstract_session*>
         void init_accept(uv_loop_t* loop, uv_stream_t* server, Serv* serv, SessTy*)
@@ -108,6 +103,7 @@ namespace hl
             _client.data = this;
             init_remote_address();
             serv->on_accept(reinterpret_cast<SessTy*>(this));
+            on_connect();
             uv_read_start(stream, alloc_buffer_uv, on_read_uv);
         }
     };

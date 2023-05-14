@@ -13,20 +13,21 @@ hl::database::accessor::accessor()
     , _cv()
     , _waiting_jobs()
     , _stop()
+    , _thread()
+    , _jobs()
 {
+    _jobs.reserve(64);
     // touch connection pool first
     hl::singleton<pool_type>::get();
 
     std::thread worker([](hl::database::accessor *$this) { $this->run(); }, this);
-    worker.detach();
+    _thread = std::move(worker);
+
     LOGI << "Started database accessor.";
 }
 
 void hl::database::accessor::run()
 {
-    std::vector<std::shared_ptr<job>> jobs;
-    jobs.reserve(64);
-
     while (true)
     {
         synchronized (_mutex)
@@ -36,24 +37,25 @@ void hl::database::accessor::run()
                 return;
             while (!_waiting_jobs.empty())
             {
-                jobs.push_back(_waiting_jobs.front());
+                _jobs.push_back(_waiting_jobs.front());
                 _waiting_jobs.pop();
             }
         }
 
         auto conn = hl::singleton<pool_type>::get().get_connection();
-        for (auto& job : jobs)
+        for (auto& job : _jobs)
         {
             job->process(*conn);
         }
-        jobs.clear();
+        _jobs.clear();
     }
-    LOGI << "Stopped database accessor.";
 }
 
 void hl::database::accessor::end()
 {
-    LOGI << "Stopping database accessor..";
+    LOGD << "Stopping database accessor..";
     _stop = true;
     _cv.notify_all();
+    _thread.join();
+    LOGI << "Stopped database accessor.";
 }

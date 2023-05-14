@@ -21,25 +21,21 @@ namespace hl::master
         std::vector<std::shared_ptr<hl::database::accessor>> _accessor;
         size_t _accessor_count;
         std::atomic_size_t _accessor_robin;
+        mutable std::recursive_mutex _mutex;
+        std::unordered_map<server_type, std::unordered_map<uint32_t, std::shared_ptr<master_session>>> _sessions;
 
     public:
-        master_server()
-                : abstract_server()
-                , _accessor()
-                , _accessor_count()
-                , _accessor_robin()
-        {
-            const auto config = hl::yaml::load("master.yaml");
-            const auto accessor_count = config["thread"]["db_accessor_count"].as<size_t>(1);
-            for (size_t i = 0; i < accessor_count; i++)
-            {
-                _accessor.push_back(std::make_shared<hl::database::accessor>());
-            }
-            _accessor_count = accessor_count;
-        }
+        master_server();
 
         hl::database::accessor& accessor();
         void on_accept(master_session* session) override;
+        void add(master_session& session);
+        void remove(master_session& session);
+        bool try_get(server_type type, uint32_t id, std::shared_ptr<master_session>& ptr) const;
+        auto get(server_type type, uint32_t id) const -> std::shared_ptr<master_session>;
+
+        inline auto sbegin(server_type type) { return _sessions.begin(); }
+        inline auto send(server_type type) { return _sessions.end(); }
     };
 }
 

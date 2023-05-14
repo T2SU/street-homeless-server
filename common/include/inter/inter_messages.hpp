@@ -17,7 +17,6 @@ namespace hl
     {
         InternalServerMessage_SetUpRes,
         InternalServerMessage_EnterGameRes,
-        InternalServerMessage_ChangeMapRes,
         InternalServerMessage_MapManagementReq,
 
         InternalServerMessage_Max
@@ -28,7 +27,6 @@ namespace hl
         InternalClientMessage_SetUpReq,
         InternalClientMessage_EnterGameReq,
         InternalClientMessage_LogoutReq,
-        InternalClientMessage_ChangeMapReq,
         InternalClientMessage_MapManagementRes,
 
         InternalClientMessage_Max

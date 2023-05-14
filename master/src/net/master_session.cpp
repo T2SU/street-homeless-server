@@ -6,6 +6,7 @@
 #include "net/master_session.hpp"
 #include "net/master_server.hpp"
 #include "net/handler.hpp"
+#include "world/game_world.hpp"
 
 hl::master::master_session::master_session(server* server, uint32_t id, uint32_t socket_sn)
         : abstract_session(server, id, socket_sn)
@@ -17,6 +18,11 @@ hl::master::master_session::master_session(server* server, uint32_t id, uint32_t
 
 void hl::master::master_session::on_close(close_reason reason)
 {
+    hl::singleton<hl::master::master_server>::get().remove(*this);
+    if (_type == server_type::game)
+    {
+        hl::singleton<hl::master::game_world>::get().remove_server(get_idx());
+    }
 }
 
 void hl::master::master_session::on_packet(in_buffer &in_buffer)
@@ -34,14 +40,15 @@ const char *hl::master::master_session::get_type_name() const
     return "master_session";
 }
 
-bool hl::master::master_session::is_setup() const
-{
-    return _setup;
-}
-
 void hl::master::master_session::set_server_type(server_type type, uint32_t idx, uint32_t game_flag)
 {
     _type = type;
     _idx = idx;
     _game_flag = game_flag;
+}
+
+void hl::master::master_session::set_endpoint(std::string address, uint16_t port)
+{
+    _endpoint_address = std::move(address);
+    _endpoint_port = port;
 }

@@ -12,8 +12,11 @@ hl::socket_thread::socket_thread(uint32_t id)
     , _mutex()
     , _alive(true)
     , _queued_sessions()
+    , _thread()
 {
     LOGD << "Constructed socket thread - " << _id;
+    std::thread th([this](){ run(); });
+    _thread = std::move(th);
 }
 
 hl::socket_thread::~socket_thread()
@@ -21,23 +24,23 @@ hl::socket_thread::~socket_thread()
     LOGD << "Destructed socket thread - " << _id;
 }
 
-void hl::socket_thread::run(socket_thread *$this)
+void hl::socket_thread::run()
 {
-    while ($this->_alive)
+    while (_alive)
     {
         abstract_session* session;
-        synchronized ($this->_mutex)
+        synchronized (_mutex)
         {
-            $this->_cv.wait(_ul, [$this]{ return !$this->_queued_sessions.empty() || !$this->_alive; });
-            if ($this->_alive && $this->_queued_sessions.empty())
+            _cv.wait(_ul, [this] { return !_queued_sessions.empty() || !_alive; });
+            if (_alive && _queued_sessions.empty())
                 break;
-            session = $this->_queued_sessions.front();
-            $this->_queued_sessions.pop_front();
-            LOGV << session << "was dequeued from socket thread - " << $this->_id;
+            session = _queued_sessions.front();
+            _queued_sessions.pop_front();
+            LOGV << session << "was dequeued from socket thread - " << _id;
         }
         session->do_socket_op();
     }
-    LOGD << "socket thread - " << $this->_id << " has finished.";
+    LOGV << "socket thread - " << _id << " has finished.";
 }
 
 void hl::socket_thread::enqueue(abstract_session* session)
@@ -54,5 +57,7 @@ void hl::socket_thread::stop()
 {
     _alive = false;
     _cv.notify_all();
-    LOGD << "Requested stopping socket thread - " << _id;
+    LOGV << "Requested stopping socket thread - " << _id;
+    _thread.join();
+    LOGI << "Stopped socket thread - " << _id;
 }

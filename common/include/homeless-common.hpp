@@ -20,5 +20,7 @@
 #include "net.hpp"
 #include "thread.hpp"
 #include "utils.hpp"
+#include "protobuf.hpp"
+#include "users.hpp"
 
 #endif //STREET_HOMELESS_SERVER_HOMELESS_COMMON_HPP

@@ -12,7 +12,7 @@ network:
 
 config:
   login:
-    index: 0
+    index: 1
 
 session:
   security:

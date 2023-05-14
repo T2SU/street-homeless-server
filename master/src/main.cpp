@@ -39,7 +39,7 @@ static void start_server()
     LOGI << "Stopped event loop..";
 }
 
-int main()
+int main(int argc, char* argv[])
 {
     init_logger();
     start_server();

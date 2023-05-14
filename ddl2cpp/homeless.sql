@@ -38,6 +38,8 @@ CREATE TABLE `characters` (
   `hat` int(11) NOT NULL,
   `beard` int(11) NOT NULL,
   `gender` int(11) NOT NULL,
+  `map` varchar(30) NOT NULL DEFAULT '',
+  `starting_point` varchar(30) NOT NULL DEFAULT '',
   `fat` float NOT NULL,
   `muscle` float NOT NULL,
   `slimness` float NOT NULL,
@@ -50,7 +52,7 @@ CREATE TABLE `characters` (
   KEY `money` (`money`),
   KEY `uid` (`uid`),
   CONSTRAINT `FK_characters_users` FOREIGN KEY (`uid`) REFERENCES `users` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -59,7 +61,7 @@ CREATE TABLE `characters` (
 
 LOCK TABLES `characters` WRITE;
 /*!40000 ALTER TABLE `characters` DISABLE KEYS */;
-INSERT INTO `characters` VALUES (1,1,'김철남',100,0,100,100,0,0,0,0,0,0,0,0,0,0,0,0,860,'2023-05-12 03:17:43','2023-05-12 03:17:43');
+INSERT INTO `characters` VALUES (11,1,'배점례',100,0,100,100,3,11438216,5,4,4,-1,-1,1,'','',0,0,100,70.7527,0,'2023-05-13 04:25:49','2023-05-13 04:25:49'),(12,1,'가난의용사손상식',100,0,100,100,2,3026478,6,6,6,2,6,0,'','',100,13.7908,0.5,0.5,0,'2023-05-13 05:51:46','2023-05-13 05:51:46'),(14,1,'계란도둑김철남',100,0,100,100,4,16777215,1,9,8,-1,5,0,'','',67.8967,66.11,0.5,0.5,0,'2023-05-13 09:30:29','2023-05-13 09:30:29');
 /*!40000 ALTER TABLE `characters` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -87,7 +89,6 @@ CREATE TABLE `inventory` (
 
 LOCK TABLES `inventory` WRITE;
 /*!40000 ALTER TABLE `inventory` DISABLE KEYS */;
-INSERT INTO `inventory` VALUES (1,1,40000000,10),(2,1,40000001,55),(3,1,30000000,3),(4,1,20000000,2);
 /*!40000 ALTER TABLE `inventory` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -106,6 +107,7 @@ CREATE TABLE `users` (
   `created` datetime NOT NULL DEFAULT current_timestamp(),
   `last_connected` datetime NOT NULL DEFAULT current_timestamp(),
   `session_ip` varchar(20) DEFAULT NULL,
+  `device_id` text DEFAULT NULL,
   PRIMARY KEY (`uid`),
   UNIQUE KEY `name` (`name`),
   KEY `last_connected` (`last_connected`),
@@ -119,7 +121,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'test','125d6d03b32c84d492747f79cf0bf6e179d287f341384eb5d6d3197525ad6be8e6df0116032935698f99a09e265073d1d6c32c274591bf1d0a20ad67cba921bc','test','2023-05-10 14:34:49','2023-05-12 03:17:07',NULL);
+INSERT INTO `users` VALUES (1,'test','125d6d03b32c84d492747f79cf0bf6e179d287f341384eb5d6d3197525ad6be8e6df0116032935698f99a09e265073d1d6c32c274591bf1d0a20ad67cba921bc','test','2023-05-10 14:34:49','2023-05-13 02:57:25',NULL,NULL);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -132,4 +134,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-05-13  0:25:47
+-- Dump completed on 2023-05-14  9:03:30

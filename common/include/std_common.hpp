@@ -26,6 +26,8 @@
 #include <chrono>
 #include <format>
 #include <memory>
+#include <ranges>
+#include <numeric>
 #include <array>
 #include <streambuf>
 #include <exception>

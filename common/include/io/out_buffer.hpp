@@ -83,6 +83,10 @@ public:
     {
         write<uint16_t>(msg);
     }
+    explicit out_buffer(uint16_t msg, size_t size = 128) : basic_out_buffer(size)
+    {
+        write<uint16_t>(msg);
+    }
     ~out_buffer() override = default;
 };
 

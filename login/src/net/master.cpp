@@ -25,3 +25,8 @@ const char *hl::login::master::get_type_name() const
 {
     return "master";
 }
+
+void hl::login::master::on_connect()
+{
+    out_buffer obuf(hl::InternalClientMessage_SetUpReq);
+}
