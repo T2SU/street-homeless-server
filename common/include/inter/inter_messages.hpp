@@ -30,6 +30,7 @@ namespace hl
         InternalClientMessage_ChangeMapReq,
         InternalClientMessage_LogoutReq,
         InternalClientMessage_MapManagementRes,
+        InternalClientMessage_SignOutReq,
 
         InternalClientMessage_Max
     };

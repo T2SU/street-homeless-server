@@ -25,7 +25,7 @@ std::shared_ptr<hl::master::master_session> hl::master::abstract_request::get_se
 {
     std::shared_ptr<hl::master::master_session> ret;
 
-    hl::singleton<hl::master::master_server>::get().try_get(server_type::game, _master_socket_sn, ret);
+    hl::singleton<hl::master::master_server>::get().try_get(_master_socket_sn, ret);
     return ret;
 }
 

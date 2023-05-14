@@ -31,6 +31,7 @@ namespace hl::master
         void on_accept(master_session* session) override;
         void add(master_session& session);
         void remove(master_session& session);
+        using abstract_server<master_session>::try_get;
         bool try_get(server_type type, uint32_t id, std::shared_ptr<master_session>& ptr) const;
         auto get(server_type type, uint32_t id) const -> std::shared_ptr<master_session>;
 

@@ -16,17 +16,19 @@ bool hl::game::map_factory::create_map(uint32_t map_sn, const std::string &scene
 
     if (!scene.empty())
     {
+        LOGV << "creating map... sn:" << map_sn << ", scene:" << scene;
         map = std::make_unique<hl::game::map>(map_sn, scene, type);
     }
     if (!map)
     {
-        LOGE << "failed to create map " << scene << "?";
+        LOGE << "failed to create map '" << scene << "'";
         return false;
     }
     synchronized (_mutex)
     {
         _maps.emplace(map_sn, std::move(map));
     }
+    LOGV << "created map! sn:" << map_sn << ", scene:" << scene;
     return true;
 }
 
@@ -36,6 +38,7 @@ void hl::game::map_factory::remove_map(uint32_t map_sn)
     {
         _maps.erase(map_sn);
     }
+    LOGV << "removed map! sn:" << map_sn;
 }
 
 hl::game::map *hl::game::map_factory::get_map(uint32_t map)

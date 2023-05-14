@@ -2,7 +2,7 @@
 // Created by TSU on 2023-05-13.
 //
 
-#ifndef STREET_HOMELESS_SERVER_LOGIN_HANDLER_HPP
+#ifndef STREET_HOMELESS_SERVER_HANDLER_HPP
 #define STREET_HOMELESS_SERVER_HANDLER_HPP
 
 #if defined(_MSC_VER) ||                                            \

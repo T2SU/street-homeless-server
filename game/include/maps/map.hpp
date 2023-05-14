@@ -32,7 +32,7 @@ namespace hl::game
         const std::string &get_scene() const;
         map_type get_type() const;
 
-        void add_player(const std::shared_ptr<player>& player);
+        void add_player(const std::shared_ptr<player>& player, const std::string& sp);
         void remove_player(uint64_t pid);
         std::shared_ptr<player> find_player(uint64_t pid);
     };

@@ -27,3 +27,11 @@ void hl::master::hangout::add_user(std::shared_ptr<user_record> user)
         _users[user->get_pid()] = user;
     }
 }
+
+void hl::master::hangout::remove_user(uint64_t pid)
+{
+    synchronized (_mutex)
+    {
+        _users.erase(pid);
+    }
+}

@@ -53,7 +53,7 @@ void hl::abstract_session::init_remote_address()
     if (addr.ss_family == AF_INET) port = reinterpret_cast<struct sockaddr_in*>(&addr)->sin_port;
     if (addr.ss_family == AF_INET6) port = reinterpret_cast<struct sockaddr_in6*>(&addr)->sin6_port;
     _remote_address = result;
-    _remote_endpoint = std::format("{}:{}", result, port);
+    _remote_endpoint = fmt::format("{}:{}", result, port);
 }
 
 void hl::abstract_session::init_connect()
@@ -106,6 +106,7 @@ void hl::abstract_session::alloc_buffer_uv(uv_handle_t *handle, size_t suggested
 void hl::abstract_session::on_read_uv(uv_stream_t *client, ssize_t read_size, const uv_buf_t *buf)
 {
     auto $this = reinterpret_cast<abstract_session*>(client->data);
+    if (!$this->is_active()) return;
     if (read_size < 0)
     {
         if (read_size != UV_EOF)
@@ -203,7 +204,7 @@ void hl::abstract_session::do_socket_op()
                 catch (const std::exception& ex)
                 {
                     LOGE << "error on handling packet from (" << get_remote_endpoint() << "). dump=[" << job.in_buffer->dump_packet() << "]";
-                    if (++_packet_error_count >= _server->get_packet_error_threshold())
+                    if (_server && ++_packet_error_count >= _server->get_packet_error_threshold())
                     {
                         LOGW << "too many packet error from (" << get_remote_endpoint() << "). disconnect session forcely.";
                         close();
@@ -233,6 +234,7 @@ void hl::abstract_session::do_socket_op()
                     on_close(_closed_reason);
                     if (_server)
                         _server->remove_from_connected(this);
+                    return;
                 }
                 else LOGV << this << "close event was fired, but already closed.";
                 break;
@@ -281,8 +283,8 @@ void hl::abstract_session::close(close_reason reason)
     }
     _closed_reason = reason;
     socket_job job{.op=socket_op::CLOSE, .close_reason=reason};
-    enqueue_into_thread_pool(std::move(job));
     LOGV << this << "requested closing session. reason: " << close_reason_to_str(reason);
+    enqueue_into_thread_pool(std::move(job));
 }
 
 void hl::abstract_session::enqueue_into_thread_pool(socket_job&& val)
@@ -291,7 +293,7 @@ void hl::abstract_session::enqueue_into_thread_pool(socket_job&& val)
     {
         _jobs.emplace(val);
     }
-    singleton<socket_thread_pool>::get().get_worker_thread()->enqueue(this);
+    singleton<socket_thread_pool>::get().get_worker_thread()->enqueue(get_ptr());
 }
 
 void hl::abstract_session::on_connect() {}

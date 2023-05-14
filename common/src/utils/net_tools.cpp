@@ -13,7 +13,7 @@ std::string hl::net_tools::dump_memory(const void *buffer, size_t len)
     while (len-- != 0)
     {
         const auto x = *(buf++);
-        ss << std::format("{:02X}", static_cast<unsigned char>(x));
+        ss << fmt::format("{:02X}", static_cast<unsigned char>(x));
         if (len == 0)
             break;
         ss << ' ';
@@ -38,10 +38,10 @@ size_t hl::net_tools::get_utf8_length(const std::string &s)
 
 bool hl::net_tools::check_regex(const std::string &str, const std::string &re)
 {
-    std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv; // TODO more reliable source
-    std::wstring wstr(myconv.from_bytes(str));
-    std::wstring wre(myconv.from_bytes(re));
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> conv; // TODO more reliable source
+    std::wstring wide_str(conv.from_bytes(str));
+    std::wstring wide_regex(conv.from_bytes(re));
 
-    std::wregex we(wre);
-    return std::regex_search(wstr, we);
+    std::wregex we(wide_regex);
+    return std::regex_search(wide_str, we);
 }

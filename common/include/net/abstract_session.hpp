@@ -19,7 +19,7 @@
 
 namespace hl
 {
-    class abstract_session {
+class abstract_session : public std::enable_shared_from_this<abstract_session> {
     public:
         abstract_session(server* server, uint32_t id, uint32_t socket_sn);
         virtual ~abstract_session();
@@ -54,6 +54,8 @@ namespace hl
         size_t _packet_error_count;
 
         void init_remote_address();
+
+        inline std::shared_ptr<abstract_session> get_ptr() { return shared_from_this(); }
 
         void do_socket_op();
         void on_write(const std::shared_ptr<out_buffer>& out_buf);

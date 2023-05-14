@@ -28,13 +28,13 @@ void hl::socket_thread::run()
 {
     while (_alive)
     {
-        abstract_session* session;
+        std::shared_ptr<abstract_session> session;
         synchronized (_mutex)
         {
             _cv.wait(_ul, [this] { return !_queued_sessions.empty() || !_alive; });
             if (_alive && _queued_sessions.empty())
                 break;
-            session = _queued_sessions.front();
+            session = std::move(_queued_sessions.front());
             _queued_sessions.pop_front();
             LOGV << session << "was dequeued from socket thread - " << _id;
         }
@@ -43,7 +43,7 @@ void hl::socket_thread::run()
     LOGV << "socket thread - " << _id << " has finished.";
 }
 
-void hl::socket_thread::enqueue(abstract_session* session)
+void hl::socket_thread::enqueue(const std::shared_ptr<abstract_session>& session)
 {
     synchronized (_mutex)
     {

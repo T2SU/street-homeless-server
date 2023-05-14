@@ -23,14 +23,14 @@ namespace hl
         std::condition_variable _cv;
         std::mutex _mutex;
         std::atomic_bool _alive;
-        std::deque<abstract_session*> _queued_sessions;
+        std::deque<std::shared_ptr<abstract_session>> _queued_sessions;
         std::thread _thread;
 
     public:
         explicit socket_thread(uint32_t id);
         ~socket_thread();
 
-        void enqueue(abstract_session* session);
+        void enqueue(const std::shared_ptr<abstract_session>& session);
         void stop();
 
         void run();

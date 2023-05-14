@@ -45,6 +45,7 @@ void hl::master::master_session::set_server_type(server_type type, uint32_t idx,
     _type = type;
     _idx = idx;
     _game_flag = game_flag;
+    _setup = true;
 }
 
 void hl::master::master_session::set_endpoint(std::string address, uint16_t port)

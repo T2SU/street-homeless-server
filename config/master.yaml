@@ -1,5 +1,5 @@
 thread:
-  db_accessor_count: 4
+  db_accessor_count: 2
 
 network:
   master:

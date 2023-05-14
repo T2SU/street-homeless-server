@@ -50,7 +50,8 @@ namespace hl
 
         void remove_from_connected(abstract_session* session) override;
         void release_session(abstract_session* session);
-        bool try_get(uint32_t socket_sn, std::shared_ptr<SessTy>& ptr);
+        bool try_get(uint32_t socket_sn, std::shared_ptr<SessTy>& ptr) const;
+        std::shared_ptr<SessTy> find(uint32_t socket_sn);
 
         void begin(const std::string& bind_address, uint16_t bind_port);
         void end();
@@ -167,7 +168,7 @@ namespace hl
     }
 
     template<SessionType SessTy>
-    bool abstract_server<SessTy>::try_get(uint32_t socket_sn, std::shared_ptr<SessTy> &ptr)
+    bool abstract_server<SessTy>::try_get(uint32_t socket_sn, std::shared_ptr<SessTy> &ptr) const
     {
         synchronized (_mutex)
         {
@@ -182,6 +183,14 @@ namespace hl
     }
 
     template<SessionType SessTy>
+    std::shared_ptr<SessTy> abstract_server<SessTy>::find(uint32_t socket_sn)
+    {
+        std::shared_ptr<SessTy> ret;
+        try_get(socket_sn, ret);
+        return ret;
+    }
+
+    template<SessionType SessTy>
     void abstract_server<SessTy>::begin(const std::string& bind_address, uint16_t bind_port)
     {
 #ifndef _WIN32
@@ -191,10 +200,10 @@ namespace hl
         _server.data = this;
         const auto bind_res = uv_tcp_bind(&_server, reinterpret_cast<const struct sockaddr*>(&_addr), 0);
         if (bind_res)
-            throw acceptor_exception(std::format("bind ({})", uv_strerror(bind_res)), bind_address, bind_port);
+            throw acceptor_exception(fmt::format("bind ({})", uv_strerror(bind_res)), bind_address, bind_port);
         const auto listen_res = uv_listen(reinterpret_cast<uv_stream_t*>(&_server), DefaultBacklog, &on_accept_uv);
         if (listen_res)
-            throw acceptor_exception(std::format("listen ({})", uv_strerror(listen_res)), bind_address, bind_port);
+            throw acceptor_exception(fmt::format("listen ({})", uv_strerror(listen_res)), bind_address, bind_port);
         LOGI << "Listening on " << bind_address << ":" << bind_port;
         uv_run(_loop, UV_RUN_DEFAULT);
     }

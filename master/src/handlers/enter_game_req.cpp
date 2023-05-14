@@ -55,10 +55,13 @@ void hl::master::handlers::enter_game_req::handle_packet(master_session &session
     out_buffer obuf(hl::InternalServerMessage_EnterGameRes);
     obuf.write(socket_sn);
     obuf.write(true);
+    obuf.write(pid);
+    obuf.write(user->get_map_sn());
 
     const auto& data = user->get_player_data();
     obuf.write_str(data.get_map());
     obuf.write_str(data.get_sp());
+    obuf.write<uint8_t>(user->inc_migration_count() == 0 ? 1 : 0);
     data.encode(obuf);
 
     session.write(obuf);

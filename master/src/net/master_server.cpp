@@ -61,12 +61,18 @@ void hl::master::master_server::add(master_session& session)
         }
 
         std::shared_ptr<master_session> ms;
-        if (!session.get_server().try_get(session.get_server_type(), session.get_socket_sn(), ms))
+        if (!session.get_server().try_get(session.get_socket_sn(), ms))
         {
             LOGW << "[" << get_server_type_string(session.get_server_type()) << "-" << session.get_idx() << "] is not connected on server?";
             return;
         }
         sessions.emplace(session.get_idx(), ms);
+
+        LOGI << "Registered " << "[" << get_server_type_string(session.get_server_type()) << "-" << session.get_idx() << "].";
+        if (session.get_server_type() == server_type::game)
+        {
+            LOGI << "flag: " << session.get_game_flag() << " / endpoint: " << session.get_endpoint_address() << ":" << session.get_endpoint_port();
+        }
     }
 }
 

@@ -20,9 +20,6 @@ namespace hl
     {
     private:
         pb::PlayerData _data;
-        pb::PlayerAppearance _appearance;
-        pb::PlayerStat _player_stat;
-        pb::Inventory _inventory;
 
         std::string _map;
         std::string _sp;

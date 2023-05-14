@@ -27,7 +27,7 @@ namespace hl
 
         void on_connect(uv_connect_t* req)
         {
-            singleton<std::unique_ptr<SessTy>>::get()->init_connect();
+            singleton<std::shared_ptr<SessTy>>::get()->init_connect();
             LOGI << "Connected to [" << _target << ":" << _port << "]. ";
         }
 
@@ -35,16 +35,16 @@ namespace hl
         connector()
                 : _addr() , _con(), _target(), _port()
         {
-            auto session = std::make_unique<SessTy>(nullptr, 0, 0);
-            singleton<std::unique_ptr<SessTy>>::get() = std::move(session);
+            auto session = std::make_shared<SessTy>(nullptr, 0, 0);
             _handle = session->get_handle();
-            uv_tcp_init(uv_default_loop(), _handle);
+            singleton<std::shared_ptr<SessTy>>::get() = std::move(session);
         }
 
         void connect(const std::string& target, uint16_t port)
         {
             using namespace std::chrono_literals;
 
+            uv_tcp_init(uv_default_loop(), _handle);
             _target = target;
             _port = port;
             uv_ip4_addr(_target.c_str(), _port, &_addr);

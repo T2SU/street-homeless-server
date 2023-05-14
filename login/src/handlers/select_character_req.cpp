@@ -43,12 +43,14 @@ public:
             }
             else
             {
-                out_buffer req(hl::InternalClientMessage_EnterGameReq);
+                out_buffer req(hl::InternalClientMessage_ChangeMapReq);
                 req.write(session->get_socket_sn());
                 req.write_str(_device_id);
                 req.write_str(session->get_remote_address());
                 req.write(_pid);
-                hl::singleton<std::unique_ptr<hl::login::master>>::get()->write(req);
+                req.write_str("");
+                req.write_str("");
+                MASTER->write(req);
                 return;
             }
         }

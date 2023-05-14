@@ -14,4 +14,6 @@
 #include <homeless-common.hpp>
 #include "homeless-db.h"
 
+#define MASTER hl::singleton<std::shared_ptr<hl::login::master>>::get()
+
 #endif //STREET_HOMELESS_SERVER_STD_HPP

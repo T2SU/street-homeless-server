@@ -22,5 +22,6 @@
 #include "character_list_result.pb.h"
 #include "select_character_result.pb.h"
 #include "delete_character_result.pb.h"
+#include "change_map_result.pb.h"
 
 #endif //STREET_HOMELESS_SERVER_EFE8BF2D16A4418DA084F69C5DF0B8AB

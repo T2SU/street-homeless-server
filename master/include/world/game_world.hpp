@@ -30,6 +30,7 @@ namespace hl::master
         using store_map_type = std::unordered_map<std::string, std::shared_ptr<map_state>>;
 
         mutable std::mutex _mutex;
+        std::unordered_map<uint32_t, std::shared_ptr<map_state>> _maps; // key: map sn
         store_map_type _fields;    // key: map scene
         store_map_type _instances; // key: map scene, value: acceptable instance
         std::unordered_map<uint32_t, game_world_dimension> _maps_of_servers; // key: server_idx
@@ -40,14 +41,14 @@ namespace hl::master
         game_world();
 
         void change_map(const std::shared_ptr<change_map_request>& req);
-        void on_after_creation(uint32_t server_idx, uint32_t map_sn);
+        void on_after_creation(uint32_t server_idx, uint32_t map_sn, bool success);
         void remove_player(uint64_t pid);
 
         void add_server(uint32_t server_idx, uint32_t flag);
         void remove_server(uint32_t server_idx);
 
     private:
-        void create_map(const std::shared_ptr<change_map_request>& req);
+        std::shared_ptr<map_state> create_map(const std::shared_ptr<change_map_request>& req);
 
         void put_map(const std::shared_ptr<map_state>& map);
         void request_map_creation(const std::shared_ptr<map_state>& map);

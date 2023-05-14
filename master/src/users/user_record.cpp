@@ -17,6 +17,7 @@ hl::master::user_record::user_record(uint32_t server_idx, uint32_t socket_sn, ui
         , _mutex()
         , _device_id(std::move(device_id))
         , _remote_address(std::move(remote_address))
+        , _migration_count(0)
 {}
 
 const hl::player_data &hl::master::user_record::get_player_data() const

@@ -15,7 +15,14 @@ namespace hl::game
 {
     class player_stat
     {
+    private:
+        pb::PlayerStat _stat;
+        pb::PlayerAppearance _appearance;
 
+    public:
+        player_stat();
+
+        void init(pb::PlayerData& data);
     };
 }
 

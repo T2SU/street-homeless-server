@@ -27,19 +27,18 @@ static void init_logger()
 static void start_server(const char* config)
 {
     const auto common_config = hl::yaml::load("common.yaml");
-    const auto login_config = hl::yaml::load(std::format("{}.yaml", config));
+    const auto login_config = hl::yaml::load(fmt::format("{}.yaml", config));
 
     const auto threads = common_config["thread"]["socket_thread_count"].as<int32_t>(4);
     hl::singleton<hl::socket_thread_pool>::get().begin(threads);
-
-    const auto bind_address = login_config["network"]["address"].as<std::string>("0.0.0.0");
-    const auto port = login_config["network"]["port"].as<int32_t>(7675);
-    hl::singleton<hl::login::login_server>::get().begin(bind_address, port);
 
     const auto master_address = login_config["network"]["inter_server"]["master_host"].as<std::string>();
     const auto master_port = login_config["network"]["inter_server"]["master_port"].as<int32_t>();
     hl::singleton<hl::connector<hl::login::master>>::get().connect(master_address, master_port);
 
+    const auto bind_address = login_config["network"][config]["bind"]["address"].as<std::string>("0.0.0.0");
+    const auto port = login_config["network"][config]["bind"]["port"].as<int32_t>(7675);
+    hl::singleton<hl::login::login_server>::get().begin(bind_address, port);
     LOGI << "Stopped event loop..";
 }
 

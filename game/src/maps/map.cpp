@@ -25,3 +25,18 @@ map_type hl::game::map::get_type() const
 {
     return _type;
 }
+
+void hl::game::map::add_player(const std::shared_ptr<player> &player, const std::string &sp)
+{
+
+}
+
+void hl::game::map::remove_player(uint64_t pid)
+{
+
+}
+
+std::shared_ptr<hl::game::player> hl::game::map::find_player(uint64_t pid)
+{
+    return {};
+}

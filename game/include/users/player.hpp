@@ -19,8 +19,22 @@ namespace hl::game
     class player
     {
     private:
+        uint64_t _pid;
+        uint64_t _uid;
         player_stat _stat;
+        int32_t _money;
         std::vector<item> _inventory;
+        std::string _name;
+        uint32_t _map_sn;
+
+
+    public:
+        player();
+
+        void init(pb::PlayerData& data, uint32_t map_sn);
+
+    private:
+        void init_inventory(pb::PlayerData& data);
     };
 }
 

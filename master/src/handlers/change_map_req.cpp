@@ -20,21 +20,33 @@ private:
     const std::string _device_id;
     const std::string _remote_address;
     const uint64_t _pid;
-    const std::string _scene;
-    const std::string _sp;
+
+private:
+    void send_error(std::shared_ptr<hl::master::master_session> session, pb::ChangeMapResult error)
+    {
+        out_buffer out_buf(hl::InternalServerMessage_ChangeMapRes);
+        out_buf.write(_socket_sn);
+        out_buf.write(error);
+        session->write(out_buf);
+    }
 
 public:
     first_load_player_job(uint32_t master_socket_sn, uint32_t socket_sn, std::string device_id, std::string remote_address,
-                   uint64_t pid, std::string scene, std::string sp)
+                   uint64_t pid)
             : _master_socket_sn(master_socket_sn), _socket_sn(socket_sn), _device_id(std::move(device_id))
-            , _remote_address(std::move(remote_address)), _pid(pid), _scene(std::move(scene)), _sp(std::move(sp))
+            , _remote_address(std::move(remote_address)), _pid(pid)
     {}
 
     void process(sqlpp::mysql::connection &conn) override
     {
         std::shared_ptr<hl::master::master_session> session;
-        if (!hl::singleton<hl::master::master_server>::get().try_get(server_type::game, _master_socket_sn, session))
+        if (!hl::singleton<hl::master::master_server>::get().try_get(_master_socket_sn, session))
             return;
+        if (HANGOUT.find_user(_pid))
+        {
+            send_error(session, pb::ChangeMapResult_AlreadyConnected);
+            return;
+        }
 
         hl::player_data data;
 
@@ -42,20 +54,27 @@ public:
         {
             data.load(_pid, conn);
 
-            auto user = std::make_shared<hl::master::user_record>(0, 0, _pid, _device_id, _remote_address);
-            auto req = std::make_shared<hl::master::change_map_request>(_master_socket_sn, _pid, data.get_map(), data.get_sp(), true);
+            auto user = std::make_shared<hl::master::user_record>(0, _socket_sn, _pid, _device_id, _remote_address);
+            auto req = std::make_shared<hl::master::change_map_request>(_master_socket_sn, _pid, data.get_map(),
+                                                                        data.get_sp(), true);
             user->set_player_data(std::move(data));
 
+            LOGV << "adding user to hangout (" << user->get_pid() << ")";
             HANGOUT.add_user(user);
+
+            LOGV << "changing user map to " << req->get_scene() << "," << req->get_starting_point() << " ("
+                 << user->get_pid() << ")";
             GAME_WORLD.change_map(req);
         }
-        catch (const std::exception& ex)
+        catch (const sqlpp::exception &ex)
         {
             LOGE << "failed to load player " << _pid << ": " << ex.what();
-            out_buffer out_buf(hl::InternalServerMessage_ChangeMapRes);
-            out_buf.write(_socket_sn);
-            out_buf.write(false);
-            session->write(out_buf);
+            send_error(session, pb::ChangeMapResult_DatabaseError);
+        }
+        catch (const std::exception &ex)
+        {
+            LOGE << "failed to load player " << _pid << ": " << ex.what();
+            send_error(session, pb::ChangeMapResult_UnknownError);
         }
     }
 };
@@ -72,20 +91,22 @@ void hl::master::handlers::change_map_req::handle_packet(master_session &session
     if (scene.empty())
     {
         hl::singleton<hl::master::master_server>::get().accessor().post<first_load_player_job>
-                (session.get_socket_sn(), socket_sn, device_id, remote_address, pid, scene, sp);
+                (session.get_socket_sn(), socket_sn, device_id, remote_address, pid);
     }
     else
     {
+        // TODO 게임 서버에서 맵 이동 전, scene, sp 유효성 검사
         auto req = std::make_shared<hl::master::change_map_request>(session.get_socket_sn(), pid, scene, sp, false);
         auto user = req->get_user();
         user->set_server_idx(0);
         user->set_player_socket_sn(0);
         user->set_new_map(scene, sp);
         user->set_state(user_state::migrating);
-        hl::singleton<hl::master::game_world>::get().change_map(req);
+        GAME_WORLD.change_map(req);
     }
 }
 
+// 넣어야 하나?
 //        if (!req->get_user() || !req->get_session())
 //        {
 //            out_buffer obuf(hl::InternalServerMessage_ChangeMapRes);

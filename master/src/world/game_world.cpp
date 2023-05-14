@@ -45,11 +45,11 @@ void hl::master::game_world::change_map(const std::shared_ptr<change_map_request
             auto field = _fields.find(scene);
             if (field == _fields.end())
             {
-                create_map(req);
+                map = create_map(req);
             }
             else
             {
-                field->second->add_player(req);
+                map = field->second;
             }
         }
         else
@@ -57,17 +57,18 @@ void hl::master::game_world::change_map(const std::shared_ptr<change_map_request
             auto instance = _instances.find(scene);
             if (instance == _instances.end())
             {
-                create_map(req);
+                map = create_map(req);
             }
             else
             {
-                instance->second->add_player(req);
+                map = instance->second;
             }
         }
+        map->add_player(req);
     }
 }
 
-void hl::master::game_world::on_after_creation(uint32_t server_idx, uint32_t map_sn)
+void hl::master::game_world::on_after_creation(uint32_t server_idx, uint32_t map_sn, bool success)
 {
     synchronized (_mutex)
     {
@@ -83,7 +84,13 @@ void hl::master::game_world::on_after_creation(uint32_t server_idx, uint32_t map
             LOGV << "returned";
             return;
         }
-        map_it->second->process_after_creation();
+        map_it->second->process_after_creation(success);
+        if (!success)
+        {
+            LOGV << "failed to create map from game server - " << server_idx << ".. deleting map " << map_sn;
+            remove_map(map_it->second);
+        }
+        map_it->second->set_state(map_load_state::existence);
     }
 }
 
@@ -134,24 +141,29 @@ void hl::master::game_world::remove_server(uint32_t server_idx)
     }
 }
 
-
 /// private:
 
-void hl::master::game_world::create_map(const std::shared_ptr<change_map_request>& req)
+std::shared_ptr<hl::master::map_state> hl::master::game_world::create_map(const std::shared_ptr<change_map_request>& req)
 {
+    LOGV << "creating game world map [" << req->get_scene() << "]";
     const auto map_type = get_map_type(req->get_scene());
     const auto server_idx = retrieve_server_for_map(map_type);
     auto new_map = std::make_shared<map_state>(++_sn_counter, server_idx, map_type, req->get_scene());
     if (map_type == map_type::field)
     {
-        _fields.emplace(req->get_scene(), new_map).first;
+        _fields.emplace(req->get_scene(), new_map);
     }
     else
     {
-        _instances.emplace(req->get_scene(), new_map).first;
+        _instances.emplace(req->get_scene(), new_map);
     }
+    LOGV << "putting game world map [" << req->get_scene() << "]";
     put_map(new_map);
+
+    LOGV << "requesting game world map creation [" << req->get_scene() << "] to server " << server_idx;
     request_map_creation(new_map);
+
+    return new_map;
 }
 
 void hl::master::game_world::put_map(const std::shared_ptr<map_state>& map)
@@ -167,6 +179,7 @@ void hl::master::game_world::put_map(const std::shared_ptr<map_state>& map)
     {
         maps_of_server_it->second.maps.emplace(map->get_map_sn(), map);
     }
+    _maps.emplace(map->get_map_sn(), map);
 }
 
 void hl::master::game_world::request_map_creation(const std::shared_ptr<map_state> &map)
@@ -194,6 +207,7 @@ void hl::master::game_world::remove_map(const std::shared_ptr<map_state>& map)
     {
         maps_of_server_it->second.maps.erase(map->get_map_sn());
     }
+    _maps.erase(map->get_map_sn());
 }
 
 uint32_t hl::master::game_world::retrieve_server_for_map(map_type type) const

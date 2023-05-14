@@ -27,13 +27,13 @@ static void init_logger()
 static void start_server(const char* config)
 {
     const auto common_config = hl::yaml::load("common.yaml");
-    const auto game_config = hl::yaml::load(std::format("{}.yaml", config));
+    const auto game_config = hl::yaml::load(fmt::format("{}.yaml", config));
 
     const auto threads = common_config["thread"]["socket_thread_count"].as<int32_t>(4);
     hl::singleton<hl::socket_thread_pool>::get().begin(threads);
 
     const auto idx = game_config["config"]["game"]["index"].as<uint32_t>();
-    const auto flags = game_config["config"]["game"]["flags"];
+    const auto flags = game_config["config"]["game"]["type"];
     const auto flag = std::accumulate(flags.begin(), flags.end(), game_server_flag::empty,
                                       [](game_server_flag f, const auto& n){
         const auto type = n.template as<std::string>();
@@ -41,7 +41,7 @@ static void start_server(const char* config)
             return static_cast<game_server_flag>(f | game_server_flag::game_field);
         if (type == "instance")
             return static_cast<game_server_flag>(f | game_server_flag::game_instance);
-        throw std::invalid_argument(std::format("invalid game server flag type '{}'", type));
+        throw std::invalid_argument(fmt::format("invalid game server flag type '{}'", type));
     });
     hl::singleton<hl::game::game_server>::get().set_server_config(idx, flag);
 
@@ -53,8 +53,8 @@ static void start_server(const char* config)
     const auto master_port = game_config["network"]["inter_server"]["master_port"].as<int32_t>();
     hl::singleton<hl::connector<hl::game::master>>::get().connect(master_address, master_port);
 
-    const auto bind_address = game_config["network"]["address"].as<std::string>("0.0.0.0");
-    const auto port = game_config["network"]["port"].as<int32_t>(7676);
+    const auto bind_address = game_config["network"][config]["bind"]["address"].as<std::string>();
+    const auto port = game_config["network"][config]["bind"]["port"].as<int32_t>();
     hl::singleton<hl::game::game_server>::get().begin(bind_address, port);
     LOGI << "Stopped event loop..";
 }

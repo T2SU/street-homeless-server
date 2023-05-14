@@ -16,10 +16,14 @@ void hl::game::mhandlers::map_management_req::handle_packet(master &session, in_
 
     if (command == map_management_type::create)
     {
-        hl::singleton<map_factory>::get().create_map(map_sn, scene, type);
+        auto result = MAPS.create_map(map_sn, scene, type);
+        out_buffer obuf(hl::InternalClientMessage_MapManagementRes);
+        obuf.write(map_sn);
+        obuf.write(result);
+        session.write(obuf);
     }
     else if (command == map_management_type::remove)
     {
-        hl::singleton<map_factory>::get().remove_map(map_sn);
+        MAPS.remove_map(map_sn);
     }
 }

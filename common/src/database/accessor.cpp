@@ -26,6 +26,11 @@ hl::database::accessor::accessor()
     LOGI << "Started database accessor.";
 }
 
+hl::database::accessor::~accessor()
+{
+    end();
+}
+
 void hl::database::accessor::run()
 {
     while (true)
@@ -53,6 +58,7 @@ void hl::database::accessor::run()
 
 void hl::database::accessor::end()
 {
+    if (_stop) return;
     LOGD << "Stopping database accessor..";
     _stop = true;
     _cv.notify_all();

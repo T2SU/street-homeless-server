@@ -26,5 +26,8 @@
   }, {
     "name" : "protobuf",
     "version>=" : "3.21.12"
+  }, {
+    "name" : "fmt",
+    "version>=" : "9.1.0#1"
   } ]
 }

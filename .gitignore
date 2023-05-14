@@ -46,3 +46,4 @@ _deps
 cmake-build-debug
 cmake-build-release
 bin/
+vcpkg_installed/

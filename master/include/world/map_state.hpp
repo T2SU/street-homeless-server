@@ -38,8 +38,8 @@ namespace hl::master
         void remove_player(uint64_t pid);
 
         void add_queue(std::shared_ptr<change_map_request> req);
-        void process_after_creation();
-        void flush(const std::shared_ptr<change_map_request>& req);
+        void process_after_creation(bool success);
+        void flush(const std::shared_ptr<change_map_request>& req, pb::ChangeMapResult success);
     };
 }
 

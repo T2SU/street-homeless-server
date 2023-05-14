@@ -5,6 +5,7 @@
 #include "std.hpp"
 #include "net/master.hpp"
 #include "net/master_handler.hpp"
+#include "net/login_server.hpp"
 
 hl::login::master::master(server* server, uint32_t id, uint32_t socket_sn)
         : abstract_session(server, id, socket_sn)
@@ -29,4 +30,6 @@ const char *hl::login::master::get_type_name() const
 void hl::login::master::on_connect()
 {
     out_buffer obuf(hl::InternalClientMessage_SetUpReq);
+    hl::singleton<hl::login::login_server>::get().encode_config(obuf);
+    write(obuf);
 }

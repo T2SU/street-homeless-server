@@ -33,6 +33,7 @@ void hl::game::game_server::set_server_config(uint32_t idx, game_server_flag fla
 
 void hl::game::game_server::encode_config(out_buffer &obuf)
 {
+    obuf.write(server_type::game);
     obuf.write<uint8_t>(_idx);
     obuf.write(_flag);
     obuf.write_str(_endpoint_address);

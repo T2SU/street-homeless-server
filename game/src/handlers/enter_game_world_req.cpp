@@ -14,7 +14,7 @@ void hl::game::handlers::enter_game_world_req::handle_packet(game_session &sessi
 
     if (session.get_player())
     {
-        LOGW << "Already have player. session will be closed forcely.";
+        LOGW << "Already have player. session will be closed force.";
         session.close();
         return;
     }

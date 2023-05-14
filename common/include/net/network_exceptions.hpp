@@ -25,7 +25,7 @@ private:
     const std::string _msg;
 public:
     acceptor_exception(std::string operation, std::string bind_address, uint16_t bind_port)
-        : _msg(std::format("failed to {}. {}:{}", operation, bind_address, bind_port)){}
+        : _msg(fmt::format("failed to {}. {}:{}", operation, bind_address, bind_port)){}
 
         [[nodiscard]] const char* what() const noexcept override { return _msg.c_str(); }
 };

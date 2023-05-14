@@ -28,8 +28,12 @@ void hl::master::handlers::setup_req::handle_packet(master_session &session, in_
             break;
         }
         case server_type::login:
-            session.set_server_type(server_type::login, 0, 0);
+        {
+            const auto idx = in_buf.read<uint8_t>();
+
+            session.set_server_type(server_type::login, idx, 0);
             break;
+        }
     }
     hl::singleton<hl::master::master_server>::get().add(session);
 }

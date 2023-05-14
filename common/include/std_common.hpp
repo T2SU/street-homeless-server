@@ -24,7 +24,6 @@
 #include <queue>
 #include <thread>
 #include <chrono>
-#include <format>
 #include <memory>
 #include <ranges>
 #include <numeric>
@@ -50,6 +49,7 @@
 #include <uv.h>
 #include <openssl/sha.h>
 #include <yaml-cpp/yaml.h>
+#include <fmt/core.h>
 
 #include "utils/synchronized.hpp"
 #include "utils/singleton.hpp"

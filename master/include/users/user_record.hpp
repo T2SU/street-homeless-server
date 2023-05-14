@@ -32,6 +32,7 @@ namespace hl::master
         std::mutex _mutex;
         std::string _device_id;
         std::string _remote_address;
+        size_t _migration_count;
 
     public:
         user_record(uint32_t server_idx, uint32_t socket_sn, uint64_t pid, std::string device_id, std::string remote_address);
@@ -42,6 +43,7 @@ namespace hl::master
         inline void set_player_socket_sn(uint32_t socket_sn) { _socket_sn = socket_sn; }
         inline uint32_t get_server_idx() const {return _server_idx; }
         inline uint32_t get_player_socket_sn() const { return _socket_sn; }
+        inline size_t inc_migration_count() { return _migration_count; }
 
         const player_data &get_player_data() const;
         void set_player_data(player_data&& player_data);

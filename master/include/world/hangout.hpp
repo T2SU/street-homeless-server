@@ -26,6 +26,7 @@ namespace hl::master
 
         std::shared_ptr<user_record> find_user(uint64_t pid) const;
         void add_user(std::shared_ptr<user_record> user);
+        void remove_user(uint64_t pid);
     };
 }
 

@@ -7,18 +7,12 @@
 #include "homeless-db.h"
 
 hl::player_data::player_data()
-    : _data(), _appearance(), _inventory(), _player_stat(), _map(), _sp()
+    : _data(), _map(), _sp()
 {
-    _data.set_allocated_stat(&_player_stat);
-    _data.set_allocated_inventory(&_inventory);
-    _data.set_allocated_appearance(&_appearance);
 }
 
 hl::player_data::~player_data()
 {
-    _data.release_stat();
-    _data.release_inventory();
-    _data.release_appearance();
 }
 
 
@@ -56,25 +50,31 @@ void hl::player_data::load(uint64_t pid, sqlpp::mysql::connection &conn)
     _data.set_uid(user_row.pid);
     _data.set_uid(user_row.uid);
     _data.set_name(user_row.name);
-    _player_stat.set_health(static_cast<int32_t>(user_row.health));
-    _player_stat.set_tiredness(static_cast<int32_t>(user_row.tiredness));
-    _player_stat.set_max_health(static_cast<int32_t>(user_row.maxHealth));
-    _player_stat.set_max_tiredness(static_cast<int32_t>(user_row.maxTiredness));
-    _appearance.set_hair(static_cast<int32_t>(user_row.hair));
-    _appearance.set_hair_color(static_cast<int32_t>(user_row.hairColor));
-    _appearance.set_shirt_index(static_cast<int32_t>(user_row.shirt));
-    _appearance.set_pants_index(static_cast<int32_t>(user_row.pants));
-    _appearance.set_shoes_index(static_cast<int32_t>(user_row.shoes));
-    _appearance.set_hat_index(static_cast<int32_t>(user_row.hat));
-    _appearance.set_beard(static_cast<int32_t>(user_row.beard));
-    _appearance.set_gender(static_cast<int32_t>(user_row.gender));
-    _appearance.set_fat(static_cast<float>(user_row.fat));
-    _appearance.set_muscles(static_cast<float>(user_row.muscle));
-    _appearance.set_slimness(static_cast<float>(user_row.slimness));
-    _appearance.set_breast(static_cast<float>(user_row.breast));
+
+    auto stat = _data.mutable_stat();
+    stat->set_health(static_cast<int32_t>(user_row.health));
+    stat->set_tiredness(static_cast<int32_t>(user_row.tiredness));
+    stat->set_max_health(static_cast<int32_t>(user_row.maxHealth));
+    stat->set_max_tiredness(static_cast<int32_t>(user_row.maxTiredness));
+
+    auto appearance = _data.mutable_appearance();
+    appearance->set_hair(static_cast<int32_t>(user_row.hair));
+    appearance->set_hair_color(static_cast<int32_t>(user_row.hairColor));
+    appearance->set_shirt_index(static_cast<int32_t>(user_row.shirt));
+    appearance->set_pants_index(static_cast<int32_t>(user_row.pants));
+    appearance->set_shoes_index(static_cast<int32_t>(user_row.shoes));
+    appearance->set_hat_index(static_cast<int32_t>(user_row.hat));
+    appearance->set_beard(static_cast<int32_t>(user_row.beard));
+    appearance->set_gender(static_cast<int32_t>(user_row.gender));
+    appearance->set_fat(static_cast<float>(user_row.fat));
+    appearance->set_muscles(static_cast<float>(user_row.muscle));
+    appearance->set_slimness(static_cast<float>(user_row.slimness));
+    appearance->set_breast(static_cast<float>(user_row.breast));
     _map = user_row.map;
     _sp = user_row.startingPoint;
-    _inventory.set_money(static_cast<int32_t>(user_row.money));
+
+    auto inventory = _data.mutable_inventory();
+    inventory->set_money(static_cast<int32_t>(user_row.money));
 
     db::Inventory inv{};
     auto inventory_result = conn(select(inv.sn, inv.itemid, inv.amount)
@@ -83,7 +83,7 @@ void hl::player_data::load(uint64_t pid, sqlpp::mysql::connection &conn)
 
     for (const auto& inv_row : inventory_result)
     {
-        auto item = _inventory.add_items();
+        auto item = inventory->add_items();
         item->set_sn(inv_row.sn);
         item->set_item_id(static_cast<int32_t>(inv_row.itemid));
         item->set_amount(static_cast<int32_t>(inv_row.amount));

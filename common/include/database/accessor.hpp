@@ -28,6 +28,7 @@ namespace hl::database
 
     public:
         accessor();
+        ~accessor();
 
         template<typename JobTy, typename... Types>
         void post(Types&&... val)
