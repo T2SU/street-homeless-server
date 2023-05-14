@@ -12,7 +12,7 @@
 #endif
 
 #include "world/map_state.hpp"
-#include "users/change_map_req.hpp"
+#include "users/change_map_request.hpp"
 
 namespace hl::master
 {
@@ -39,15 +39,15 @@ namespace hl::master
     public:
         game_world();
 
-        void change_map(const std::shared_ptr<change_map_req>& req);
-        void on_after_creation(uint32_t map_sn);
+        void change_map(const std::shared_ptr<change_map_request>& req);
+        void on_after_creation(uint32_t server_idx, uint32_t map_sn);
         void remove_player(uint64_t pid);
 
         void add_server(uint32_t server_idx, uint32_t flag);
         void remove_server(uint32_t server_idx);
 
     private:
-        store_map_type::iterator create_map(const std::shared_ptr<change_map_req>& req);
+        void create_map(const std::shared_ptr<change_map_request>& req);
 
         void put_map(const std::shared_ptr<map_state>& map);
         void request_map_creation(const std::shared_ptr<map_state>& map);

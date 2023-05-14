@@ -32,7 +32,7 @@ static map_type get_map_type(const std::string& scene)
 
 /// public:
 
-void hl::master::game_world::change_map(const std::shared_ptr<change_map_req>& req)
+void hl::master::game_world::change_map(const std::shared_ptr<change_map_request>& req)
 {
     synchronized (_mutex)
     {
@@ -67,11 +67,23 @@ void hl::master::game_world::change_map(const std::shared_ptr<change_map_req>& r
     }
 }
 
-void hl::master::game_world::on_after_creation(uint32_t map_sn)
+void hl::master::game_world::on_after_creation(uint32_t server_idx, uint32_t map_sn)
 {
     synchronized (_mutex)
     {
-
+        auto dimension = _maps_of_servers.find(server_idx);
+        if (dimension == _maps_of_servers.end())
+        {
+            LOGV << "returned";
+            return;
+        }
+        auto map_it = dimension->second.maps.find(map_sn);
+        if (map_it == dimension->second.maps.end())
+        {
+            LOGV << "returned";
+            return;
+        }
+        map_it->second->process_after_creation();
     }
 }
 
@@ -83,14 +95,21 @@ void hl::master::game_world::remove_player(uint64_t pid)
         LOGD << "cannot remove player (" << pid << ") from game_world because user_record is not present.";
         return;
     }
-    auto map = user->get_map();
-    if (!map)
-    {
-        LOGD << "cannot remove player (" << pid << ") from game_world because user's map is null";
-        return;
-    }
     synchronized (_mutex)
     {
+        auto dimension = _maps_of_servers.find(user->get_server_idx());
+        if (dimension == _maps_of_servers.end())
+        {
+            LOGD << "cannot remove player (" << pid << ") from game_world because server idx " << user->get_server_idx() << " has no dimension.";
+            return;
+        }
+        auto map_it = dimension->second.maps.find(user->get_map_sn());
+        if (map_it == dimension->second.maps.end())
+        {
+            LOGD << "cannot remove player (" << pid << ") from game_world because server idx " << user->get_server_idx() << " doesn't have map sn " << user->get_map_sn();
+            return;
+        }
+        auto map = map_it->second;
         map->remove_player(pid);
         if (map->empty())
         {
@@ -118,24 +137,21 @@ void hl::master::game_world::remove_server(uint32_t server_idx)
 
 /// private:
 
-hl::master::game_world::store_map_type::iterator
-hl::master::game_world::create_map(const std::shared_ptr<change_map_req>& req)
+void hl::master::game_world::create_map(const std::shared_ptr<change_map_request>& req)
 {
     const auto map_type = get_map_type(req->get_scene());
     const auto server_idx = retrieve_server_for_map(map_type);
-    auto map = std::make_shared<map_state>(++_sn_counter, server_idx, map_type, req->get_scene());
-    hl::master::game_world::store_map_type::iterator ret;
+    auto new_map = std::make_shared<map_state>(++_sn_counter, server_idx, map_type, req->get_scene());
     if (map_type == map_type::field)
     {
-        ret = _fields.emplace(req->get_scene(), map).first;
+        _fields.emplace(req->get_scene(), new_map).first;
     }
     else
     {
-        ret = _instances.emplace(req->get_scene(), map).first;
+        _instances.emplace(req->get_scene(), new_map).first;
     }
-    put_map(map);
-    request_map_creation(map);
-    return ret;
+    put_map(new_map);
+    request_map_creation(new_map);
 }
 
 void hl::master::game_world::put_map(const std::shared_ptr<map_state>& map)

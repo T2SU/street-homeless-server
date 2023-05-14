@@ -14,10 +14,12 @@
 namespace hl::game
 {
     class game_server;
+    class player;
     class game_session : public abstract_session
     {
     private:
         pb::AccountData _account_data;
+        std::shared_ptr<player> _player;
 
     public:
         game_session(server* server, uint32_t id, uint32_t socket_sn);
@@ -27,6 +29,8 @@ namespace hl::game
         const char* get_type_name() const override;
         const pb::AccountData& get_account_data() const;
         void set_account_data(pb::AccountData account_data);
+        const std::shared_ptr<player> &get_player() const;
+        void set_player(const std::shared_ptr<player> &player);
 
         game_server& get_server();
     };

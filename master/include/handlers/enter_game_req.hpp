@@ -1,9 +1,9 @@
 //
-// Created by TSU on 2023-05-13.
+// Created by TSU on 2023-05-14.
 //
 
-#ifndef STREET_HOMELESS_SERVER_ENTER_WORLD_REQ_HPP
-#define STREET_HOMELESS_SERVER_ENTER_WORLD_REQ_HPP
+#ifndef STREET_HOMELESS_SERVER_9363A2ECF3864B5FBD77A013BF387DA4
+#define STREET_HOMELESS_SERVER_9363A2ECF3864B5FBD77A013BF387DA4
 
 #if defined(_MSC_VER) || \
     (defined(__GNUC__) && (__GNUC__ == 3 && __GNUC_MINOR__ >= 4) || \
@@ -17,11 +17,11 @@
 
 namespace hl::master::handlers
 {
-    struct enter_world_req : public hl::packet_handler<master_session>
+    struct enter_game_req : public hl::packet_handler<master_session>
     {
     public:
         void handle_packet(master_session &session, in_buffer &in_buf) override;
     };
 }
 
-#endif //STREET_HOMELESS_SERVER_ENTER_WORLD_REQ_HPP
+#endif //STREET_HOMELESS_SERVER_9363A2ECF3864B5FBD77A013BF387DA4

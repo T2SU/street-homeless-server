@@ -14,6 +14,14 @@ hl::player_data::player_data()
     _data.set_allocated_appearance(&_appearance);
 }
 
+hl::player_data::~player_data()
+{
+    _data.release_stat();
+    _data.release_inventory();
+    _data.release_appearance();
+}
+
+
 void hl::player_data::load(uint64_t pid, sqlpp::mysql::connection &conn)
 {
     db::Characters chr{};
@@ -84,12 +92,27 @@ void hl::player_data::load(uint64_t pid, sqlpp::mysql::connection &conn)
     LOGV << "loaded player data - " << pid << " from database";
 }
 
-const std::string &hl::player_data::get_map()
+const std::string &hl::player_data::get_map() const
 {
     return _map;
 }
 
-const std::string &hl::player_data::get_sp()
+const std::string &hl::player_data::get_sp() const
 {
     return _sp;
+}
+
+void hl::player_data::set_map(const std::string &map)
+{
+    _map = map;
+}
+
+void hl::player_data::set_sp(const std::string &sp)
+{
+    _sp = sp;
+}
+
+void hl::player_data::encode(out_buffer &obuf) const
+{
+    obuf.write_pb(_data);
 }

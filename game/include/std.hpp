@@ -19,4 +19,6 @@
 #include "inventory.pb.h"
 #include "player_appearance.pb.h"
 
+#define MASTER hl::singleton<std::unique_ptr<hl::game::master>>::get()
+
 #endif //STREET_HOMELESS_SERVER_STD_HPP

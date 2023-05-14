@@ -43,7 +43,8 @@ namespace hl
 
         void connect(const std::string& target, uint16_t port)
         {
-            using std::chrono_literals::operator""s;
+            using namespace std::chrono_literals;
+
             _target = target;
             _port = port;
             uv_ip4_addr(_target.c_str(), _port, &_addr);

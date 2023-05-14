@@ -6,6 +6,7 @@
 #include "net/game_session.hpp"
 #include "net/game_server.hpp"
 #include "net/game_handler.hpp"
+#include "users/player.hpp"
 
 hl::game::game_session::game_session(server* server, uint32_t id, uint32_t socket_sn)
         : abstract_session(server, id, socket_sn)
@@ -38,4 +39,14 @@ const pb::AccountData &hl::game::game_session::get_account_data() const
 void hl::game::game_session::set_account_data(pb::AccountData account_data)
 {
     _account_data = std::move(account_data);
+}
+
+const std::shared_ptr<hl::game::player> &hl::game::game_session::get_player() const
+{
+    return _player;
+}
+
+void hl::game::game_session::set_player(const std::shared_ptr<player> &player)
+{
+    _player = player;
 }

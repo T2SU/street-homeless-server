@@ -14,4 +14,7 @@
 #include <homeless-common.hpp>
 #include "homeless-db.h"
 
+#define HANGOUT hl::singleton<hl::master::hangout>::get()
+#define GAME_WORLD hl::singleton<hl::master::game_world>::get()
+
 #endif //STREET_HOMELESS_SERVER_STD_HPP

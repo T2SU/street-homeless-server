@@ -5,7 +5,7 @@
 #ifndef STREET_HOMELESS_SERVER_MAP_STATE_HPP
 #define STREET_HOMELESS_SERVER_MAP_STATE_HPP
 
-#include "users/change_map_req.hpp"
+#include "users/change_map_request.hpp"
 
 namespace hl::master
 {
@@ -17,7 +17,7 @@ namespace hl::master
         const map_type _map_type;
         const std::string _scene;
         map_load_state _state;
-        std::queue<std::shared_ptr<change_map_req>> _queue;
+        std::queue<std::shared_ptr<change_map_request>> _queue;
 
         std::unordered_set<uint64_t> _players;
 
@@ -34,12 +34,12 @@ namespace hl::master
         inline void set_state(map_load_state state) { _state = state; }
         [[nodiscard]] inline map_load_state get_state() const { return _state; }
 
-        void add_player(std::shared_ptr<change_map_req> req);
+        void add_player(std::shared_ptr<change_map_request> req);
         void remove_player(uint64_t pid);
 
-        void add_queue(std::shared_ptr<change_map_req> req);
+        void add_queue(std::shared_ptr<change_map_request> req);
         void process_after_creation();
-        void flush(const std::shared_ptr<change_map_req>& req);
+        void flush(const std::shared_ptr<change_map_request>& req);
     };
 }
 

@@ -23,6 +23,8 @@ namespace hl::game
         uint32_t _idx;
         game_server_flag _flag;
 
+
+
     public:
         game_server();
 

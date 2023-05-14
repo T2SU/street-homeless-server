@@ -5,6 +5,7 @@
 #include "std.hpp"
 #include "world/map_state.hpp"
 #include "net/master_session.hpp"
+#include "users/user_record.hpp"
 
 hl::master::map_state::map_state(uint32_t map_sn, uint32_t server_idx, map_type type, std::string scene)
     : _map_sn(map_sn)
@@ -17,7 +18,7 @@ hl::master::map_state::map_state(uint32_t map_sn, uint32_t server_idx, map_type 
 {
 }
 
-void hl::master::map_state::add_player(std::shared_ptr<change_map_req> req)
+void hl::master::map_state::add_player(std::shared_ptr<change_map_request> req)
 {
     if (_state == map_load_state::existence)
     {
@@ -38,7 +39,7 @@ void hl::master::map_state::remove_player(uint64_t pid)
     LOGV << "remove player from map. [" << _scene << "(" << _map_sn << ")]";
 }
 
-void hl::master::map_state::add_queue(std::shared_ptr<change_map_req> req)
+void hl::master::map_state::add_queue(std::shared_ptr<change_map_request> req)
 {
     _queue.push(std::move(req));
 }
@@ -53,7 +54,7 @@ void hl::master::map_state::process_after_creation()
     }
 }
 
-void hl::master::map_state::flush(const std::shared_ptr<change_map_req>& req)
+void hl::master::map_state::flush(const std::shared_ptr<change_map_request>& req)
 {
     auto session = req->get_session();
     auto user = req->get_user();
@@ -62,6 +63,7 @@ void hl::master::map_state::flush(const std::shared_ptr<change_map_req>& req)
         LOGV << "failed to flush change_map_req cause session or user is offline. (pid: " << req->get_pid() << ") [" << _scene << "(" << _map_sn << ")]";
         return;
     }
+    user->set_map_sn(_map_sn);
 
     auto out_buf = req->make_reply(hl::InternalServerMessage_EnterGameRes);
     out_buf.write(req->is_first_enter());

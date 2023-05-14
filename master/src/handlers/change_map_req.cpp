@@ -6,13 +6,13 @@
 #include <utility>
 
 #include "std.hpp"
-#include "handlers/enter_world_req.hpp"
+#include "handlers/change_map_req.hpp"
 #include "users/user_record.hpp"
 #include "world/game_world.hpp"
 #include "world/hangout.hpp"
-#include "users/change_map_req.hpp"
+#include "users/change_map_request.hpp"
 
-class enter_world_job : public hl::database::job
+class first_load_player_job : public hl::database::job
 {
 private:
     const uint32_t _master_socket_sn;
@@ -20,12 +20,14 @@ private:
     const std::string _device_id;
     const std::string _remote_address;
     const uint64_t _pid;
+    const std::string _scene;
+    const std::string _sp;
 
 public:
-    enter_world_job(uint32_t master_socket_sn, uint32_t socket_sn, std::string device_id, std::string remote_address,
-                    uint64_t pid)
+    first_load_player_job(uint32_t master_socket_sn, uint32_t socket_sn, std::string device_id, std::string remote_address,
+                   uint64_t pid, std::string scene, std::string sp)
             : _master_socket_sn(master_socket_sn), _socket_sn(socket_sn), _device_id(std::move(device_id))
-            , _remote_address(std::move(remote_address)), _pid(pid)
+            , _remote_address(std::move(remote_address)), _pid(pid), _scene(std::move(scene)), _sp(std::move(sp))
     {}
 
     void process(sqlpp::mysql::connection &conn) override
@@ -40,17 +42,17 @@ public:
         {
             data.load(_pid, conn);
 
-            auto user = std::make_shared<hl::master::user_record>(0, 0, _pid);
-            auto req = std::make_shared<hl::master::change_map_req>(_master_socket_sn, _pid, data.get_map(), data.get_sp(), true);
+            auto user = std::make_shared<hl::master::user_record>(0, 0, _pid, _device_id, _remote_address);
+            auto req = std::make_shared<hl::master::change_map_request>(_master_socket_sn, _pid, data.get_map(), data.get_sp(), true);
             user->set_player_data(std::move(data));
 
-            hl::singleton<hl::master::hangout>::get().add_user(user);
-            hl::singleton<hl::master::game_world>::get().change_map(req);
+            HANGOUT.add_user(user);
+            GAME_WORLD.change_map(req);
         }
         catch (const std::exception& ex)
         {
             LOGE << "failed to load player " << _pid << ": " << ex.what();
-            out_buffer out_buf(hl::InternalServerMessage_EnterGameRes);
+            out_buffer out_buf(hl::InternalServerMessage_ChangeMapRes);
             out_buf.write(_socket_sn);
             out_buf.write(false);
             session->write(out_buf);
@@ -58,15 +60,41 @@ public:
     }
 };
 
-void hl::master::handlers::enter_world_req::handle_packet(master_session &session, in_buffer &in_buf)
+void hl::master::handlers::change_map_req::handle_packet(master_session &session, in_buffer &in_buf)
 {
     const auto socket_sn = in_buf.read<uint32_t>();
     const auto device_id = in_buf.read_str();
     const auto remote_address = in_buf.read_str();
     const auto pid = in_buf.read<uint64_t>();
+    const auto scene = in_buf.read_str();
+    const auto sp = in_buf.read_str();
 
-
+    if (scene.empty())
+    {
+        hl::singleton<hl::master::master_server>::get().accessor().post<first_load_player_job>
+                (session.get_socket_sn(), socket_sn, device_id, remote_address, pid, scene, sp);
+    }
+    else
+    {
+        auto req = std::make_shared<hl::master::change_map_request>(session.get_socket_sn(), pid, scene, sp, false);
+        auto user = req->get_user();
+        user->set_server_idx(0);
+        user->set_player_socket_sn(0);
+        user->set_new_map(scene, sp);
+        user->set_state(user_state::migrating);
+        hl::singleton<hl::master::game_world>::get().change_map(req);
+    }
 }
+
+//        if (!req->get_user() || !req->get_session())
+//        {
+//            out_buffer obuf(hl::InternalServerMessage_ChangeMapRes);
+//            obuf.write(socket_sn);
+//            obuf.write(false);
+//            session.write(obuf);
+//            return;
+//        }
+
 
 // 1. load player (from db) / 캐릭터 last_connected 업데이트
 // 2. (성공시) 서버 메모리에 user_record 올리기
@@ -87,12 +115,12 @@ void hl::master::handlers::enter_world_req::handle_packet(master_session &sessio
 //  플레이어가 migrating중 연결이 끊길 경우
 //     [[유저소켓]]        [[마스터소켓]]     [[마스터Worker1]]      [[마스터Worker2]]
 //   [SelectCharReq]
-//                        [EnterGameReq]
+//                        [ChangeMapReq]
 //                                         [                  ]
 //                                         [                  ]
 //                                         [                  ]
 //       [close]                           [                  ]
-//                         [UserExitReq]   [  enter_game_job  ]
+//                         [UserExitReq]   [  change_map_job  ]
 //                                         [                  ]     [             ]
 //                                         [                  ]     [user_exit_job]
 //                                         [                  ]     [             ]
@@ -106,3 +134,6 @@ void hl::master::handlers::enter_world_req::handle_packet(master_session &sessio
 //           db_job_state가 queued면 큐에만 올리고 아무 것도 하지 않음.
 //           db_job_state가 waiting이면 큐에 올리고, 임의의 accessor에 처리 요청
 //         warpper job이 끝나면 해당 유저의 db_job_state를 queued에서 waiting으로 다시 변경.
+
+
+

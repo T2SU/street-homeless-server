@@ -12,6 +12,7 @@
 #endif
 
 #include "protobuf.hpp"
+#include "io/out_buffer.hpp"
 
 namespace hl
 {
@@ -28,11 +29,15 @@ namespace hl
 
     public:
         player_data();
+        ~player_data();
 
         void load(uint64_t pid, sqlpp::mysql::connection& conn);
+        void encode(out_buffer& obuf) const;
 
-        const std::string& get_map();
-        const std::string& get_sp();
+        const std::string& get_map() const;
+        const std::string& get_sp() const;
+        void set_map(const std::string &map);
+        void set_sp(const std::string &sp);
     };
 }
 

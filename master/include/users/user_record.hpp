@@ -28,11 +28,13 @@ namespace hl::master
         user_state _state;
         db_job_state _db_job_state;
         std::queue<std::shared_ptr<hl::database::job>> _jobs;
-        std::shared_ptr<map_state> _map;
+        uint32_t _map_sn;
         std::mutex _mutex;
+        std::string _device_id;
+        std::string _remote_address;
 
     public:
-        user_record(uint32_t server_idx, uint32_t socket_sn, uint64_t pid);
+        user_record(uint32_t server_idx, uint32_t socket_sn, uint64_t pid, std::string device_id, std::string remote_address);
 
         inline uint64_t get_pid() const { return _pid; }
 
@@ -43,12 +45,16 @@ namespace hl::master
 
         const player_data &get_player_data() const;
         void set_player_data(player_data&& player_data);
+        void set_new_map(const std::string& scene, const std::string& sp);
 
         user_state get_state() const;
         void set_state(user_state state);
 
-        std::shared_ptr<map_state> get_map() const;
-        void set_map(std::shared_ptr<map_state> map);
+        uint32_t get_map_sn() const;
+        void set_map_sn(uint32_t map_sn);
+
+        const std::string &get_device_id() const;
+        const std::string &get_remote_address() const;
 
         template<typename JobTy, typename... Types>
         void enqueue_db_job(std::shared_ptr<user_record> user, Types&&... val)
