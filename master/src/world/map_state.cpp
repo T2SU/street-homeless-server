@@ -50,7 +50,9 @@ void hl::master::map_state::process_after_creation(bool success)
     LOGV << "process after creation of map. [" << _scene << "(" << _map_sn << ")]";
     while (!_queue.empty())
     {
-        flush(_queue.front(), success ? pb::ChangeMapResult_Success : pb::ChangeMapResult_InternalServerError);
+        auto& req = _queue.front();
+        flush(req, success ? pb::ChangeMapResult_Success : pb::ChangeMapResult_InternalServerError);
+        _players.emplace(req->get_pid());
         _queue.pop();
     }
 }
@@ -79,6 +81,7 @@ void hl::master::map_state::flush(const std::shared_ptr<change_map_request>& req
     }
 
     auto out_buf = req->make_reply(hl::InternalServerMessage_ChangeMapRes);
+    out_buf.write(user->get_pid());
     out_buf.write(success);
     if (success == pb::ChangeMapResult_Success)
     {
@@ -87,9 +90,9 @@ void hl::master::map_state::flush(const std::shared_ptr<change_map_request>& req
         {
             LOGV << "failed to encode map server " << _server_idx;
             out_buf = req->make_reply(hl::InternalServerMessage_ChangeMapRes);
+            out_buf.write(user->get_pid());
             out_buf.write(pb::ChangeMapResult_InternalServerError);
         }
-        out_buf.write(user->get_pid());
     }
     session->write(out_buf);
 

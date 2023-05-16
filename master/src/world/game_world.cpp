@@ -85,12 +85,15 @@ void hl::master::game_world::on_after_creation(uint32_t server_idx, uint32_t map
             return;
         }
         map_it->second->process_after_creation(success);
-        if (!success)
+        if (success)
+        {
+            map_it->second->set_state(map_load_state::existence);
+        }
+        else
         {
             LOGV << "failed to create map from game server - " << server_idx << ".. deleting map " << map_sn;
             remove_map(map_it->second);
         }
-        map_it->second->set_state(map_load_state::existence);
     }
 }
 
@@ -104,6 +107,11 @@ void hl::master::game_world::remove_player(uint64_t pid)
     }
     synchronized (_mutex)
     {
+        if (user->get_map_sn() == 0)
+        {
+            LOGD << "player (" << pid << ") has no map. do not anything.";
+            return;
+        }
         auto dimension = _maps_of_servers.find(user->get_server_idx());
         if (dimension == _maps_of_servers.end())
         {
@@ -200,14 +208,33 @@ void hl::master::game_world::request_map_creation(const std::shared_ptr<map_stat
 }
 
 
-void hl::master::game_world::remove_map(const std::shared_ptr<map_state>& map)
+void hl::master::game_world::remove_map(std::shared_ptr<map_state> map)
 {
+    LOGV << "removing map sn " << map->get_map_sn();
+    _maps.erase(map->get_map_sn());
+    if (map->get_map_type() == map_type::field)
+    {
+        LOGV << "[REMOVING] this is field map sn: " << map->get_map_sn();
+        _fields.erase(map->get_scene());
+    }
+    else if (map->get_map_type() == map_type::instance)
+    {
+        auto current = _instances.find(map->get_scene());
+        if (current->second->get_map_sn() == map->get_map_sn())
+        {
+            LOGV << "[REMOVING] this is instance map sn: " << map->get_map_sn();
+            _instances.erase(map->get_scene());
+        }
+        else
+        {
+            LOGV << "[IGNORED] this is instance map sn: " << map->get_map_sn() << ", but current instance map sn is " << current->second->get_map_sn();
+        }
+    }
     auto maps_of_server_it = _maps_of_servers.find(map->get_server_idx());
     if (maps_of_server_it != _maps_of_servers.end())
     {
         maps_of_server_it->second.maps.erase(map->get_map_sn());
     }
-    _maps.erase(map->get_map_sn());
 }
 
 uint32_t hl::master::game_world::retrieve_server_for_map(map_type type) const

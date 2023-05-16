@@ -27,6 +27,10 @@ namespace hl::game
         bool create_map(uint32_t map_sn, const std::string& scene, map_type type);
         void remove_map(uint32_t map_sn);
         map* get_map(uint32_t map);
+
+    private:
+        static void load_map(hl::game::map& map);
+        static void add_portal_to_map(hl::game::map& map, const portal& portal);
     };
 }
 

@@ -98,6 +98,14 @@ public:
         _offset += len;
     }
 
+    template<typename T>
+    T read_pb()
+    {
+        T pb;
+        read_pb(pb);
+        return pb;
+    }
+
     [[nodiscard]]
     std::string dump_packet() const
     {

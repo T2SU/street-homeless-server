@@ -236,7 +236,7 @@ void hl::abstract_session::do_socket_op()
                         _server->remove_from_connected(this);
                     return;
                 }
-                else LOGV << this << "close event was fired, but already closed.";
+                else LOGV << this << "on_close event was fired, but already closed.";
                 break;
             }
         }

@@ -16,3 +16,8 @@ void hl::game::player_stat::init(pb::PlayerData &data)
     _stat = data.stat();
     _appearance = data.appearance();
 }
+
+const pb::PlayerAppearance &hl::game::player_stat::get_appearance() const
+{
+    return _appearance;
+}

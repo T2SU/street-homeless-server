@@ -22,6 +22,7 @@ namespace hl::game
     public:
         player_stat();
 
+        const pb::PlayerAppearance& get_appearance() const;
         void init(pb::PlayerData& data);
     };
 }

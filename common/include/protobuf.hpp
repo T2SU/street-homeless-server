@@ -23,5 +23,10 @@
 #include "select_character_result.pb.h"
 #include "delete_character_result.pb.h"
 #include "change_map_result.pb.h"
+#include "player_enter.pb.h"
+#include "player_leave.pb.h"
+#include "player_move.pb.h"
+#include "vector3.pb.h"
+#include "quaternion.pb.h"
 
 #endif //STREET_HOMELESS_SERVER_EFE8BF2D16A4418DA084F69C5DF0B8AB

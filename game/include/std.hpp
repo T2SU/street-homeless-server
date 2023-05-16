@@ -12,12 +12,6 @@
 #endif
 
 #include <homeless-common.hpp>
-#include "messages.pb.h"
-#include "account_data.pb.h"
-#include "player_data.pb.h"
-#include "player_stat.pb.h"
-#include "inventory.pb.h"
-#include "player_appearance.pb.h"
 
 #define MASTER hl::singleton<std::shared_ptr<hl::game::master>>::get()
 #define MAPS hl::singleton<::hl::game::map_factory>::get()

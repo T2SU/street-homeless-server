@@ -98,7 +98,7 @@ class abstract_session : public std::enable_shared_from_this<abstract_session> {
             auto accept_res = uv_accept(server, stream);
             if (accept_res)
             {
-                LOGD << "failed to accept. close client force. reason:" << uv_strerror(accept_res);
+                LOGD << "failed to accept. on_close client force. reason:" << uv_strerror(accept_res);
                 uv_close(reinterpret_cast<uv_handle_t*>(&_client), [](uv_handle_t*){});
                 return;
             }

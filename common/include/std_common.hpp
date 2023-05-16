@@ -31,6 +31,7 @@
 #include <streambuf>
 #include <exception>
 #include <unordered_set>
+#include <random>
 #include <unordered_map>
 #include <type_traits>
 #include <algorithm>
@@ -53,6 +54,7 @@
 
 #include "utils/synchronized.hpp"
 #include "utils/singleton.hpp"
+#include "utils/point.hpp"
 #include "constants.hpp"
 
 #undef min
@@ -60,5 +62,7 @@
 #include <sqlpp11/postgresql/postgresql.h>
 #include <sqlpp11/mysql/mysql.h>
 #include <sqlpp11/sqlpp11.h>
+
+#define RAND ::hl::singleton<::hl::random>::get()
 
 #endif //STD_COMMON_HPP

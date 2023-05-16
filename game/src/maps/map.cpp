@@ -8,8 +8,10 @@
 
 hl::game::map::map(uint32_t map_sn, std::string scene, map_type type)
         : _map_sn(map_sn), _scene(std::move(scene)), _type(type)
-        , _mutex(), _players()
-{}
+        , _portals(), _starting_points()
+        , _mutex(), _players(), _objects()
+{
+}
 
 uint32_t hl::game::map::get_map_sn() const
 {
@@ -28,15 +30,119 @@ map_type hl::game::map::get_type() const
 
 void hl::game::map::add_player(const std::shared_ptr<player> &player, const std::string &sp)
 {
+    const auto& pt = get_portal(sp);
+    synchronized(_mutex)
+    {
+        player->set_position(pt.get_pos());
+        player->set_rotation(pt.get_rot());
+        for (const auto& obj : get_objects())
+            player->send_enter(obj);
+        for (const auto& p : get_players())
+        {
+            player->send_enter(std::reinterpret_pointer_cast<field_object>(p));
+            p->send_enter(std::reinterpret_pointer_cast<field_object>(player));
+        }
+        _players[player->get_pid()] = player;
+    }
+}
 
+void hl::game::map::send_first_enter(const std::shared_ptr<player> &player)
+{
+    synchronized(_mutex)
+    {
+
+    }
 }
 
 void hl::game::map::remove_player(uint64_t pid)
 {
-
+    synchronized(_mutex)
+    {
+        auto found = _players.find(pid);
+        if (found != _players.end())
+        {
+            for (const auto& p : get_players())
+            {
+                if (p->get_pid() == pid)
+                    continue;
+                p->send_leave(std::reinterpret_pointer_cast<field_object>(found->second));
+            }
+            _players.erase(pid);
+        }
+    }
 }
 
 std::shared_ptr<hl::game::player> hl::game::map::find_player(uint64_t pid)
 {
+    const auto it = _players.find(pid);
+    if (it != _players.end())
+        return it->second;
     return {};
+}
+
+const hl::game::portal &hl::game::map::get_portal(const std::string &pt) const
+{
+    if (pt == "sp")
+    {
+        return _starting_points[RAND.next<size_t>(_starting_points.size() - 1)];
+    }
+    else
+    {
+        for (const auto& row : _portals)
+        {
+            if (row.second.get_name() == "pt")
+                return row.second;
+        }
+    }
+    // fallback invalid name
+    return get_portal("sp");
+}
+
+std::shared_ptr<hl::game::field_object> hl::game::map::find_object_no_lock(uint64_t object_id) const
+{
+    auto found = _objects.find(object_id);
+    if (found != _objects.end())
+    {
+        return found->second;
+    }
+    auto found_user = _players.find(object_id);
+    if (found_user != _players.end())
+    {
+        return std::reinterpret_pointer_cast<field_object>(found_user->second);
+    }
+    return {};
+}
+
+void hl::game::map::on_move_player(const std::shared_ptr<player> &player, in_buffer &in)
+{
+    synchronized (_mutex)
+    {
+        // TODO Check movement speed and validity
+
+        const auto move_req_type = static_cast<pb::MoveRequestType>(in.read<uint8_t>());
+        const auto pos = in.read_pb<pb::Vector3>();
+        player->set_position(pos);
+        if (move_req_type == pb::MoveRequestType::SetDestination)
+        {
+            out_buffer out(pb::ServerMessage_MovePlayer);
+            out.write(player->get_pid());
+            out.write_pb(pos);
+            broadcast(out, player->get_pid());
+        }
+        else if (move_req_type == pb::MoveRequestType::TargetReached)
+        {
+            const auto rot = in.read_pb<pb::Quaternion>();
+            player->set_rotation(rot);
+        }
+    }
+}
+
+void hl::game::map::broadcast(const out_buffer& out, uint64_t exception_pid)
+{
+    for (auto player : get_players())
+    {
+        if (player->get_pid() == exception_pid)
+            continue;
+        player->get_session()->write(out);
+    }
 }

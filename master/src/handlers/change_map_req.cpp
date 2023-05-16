@@ -26,6 +26,7 @@ private:
     {
         out_buffer out_buf(hl::InternalServerMessage_ChangeMapRes);
         out_buf.write(_socket_sn);
+        out_buf.write(_pid);
         out_buf.write(error);
         session->write(out_buf);
     }

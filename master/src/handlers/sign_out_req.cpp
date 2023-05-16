@@ -12,8 +12,8 @@ void hl::master::handlers::sign_out_req::handle_packet(master_session &session, 
 {
     auto pid = in_buf.read<uint64_t>();
 
-    HANGOUT.remove_user(pid);
     GAME_WORLD.remove_player(pid);
+    HANGOUT.remove_user(pid);
 
     LOGD << "Signed out player " << pid;
 }

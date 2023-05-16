@@ -52,7 +52,7 @@ namespace hl::master
 
         void put_map(const std::shared_ptr<map_state>& map);
         void request_map_creation(const std::shared_ptr<map_state>& map);
-        void remove_map(const std::shared_ptr<map_state>& map);
+        void remove_map(std::shared_ptr<map_state> map);
 
         uint32_t retrieve_server_for_map(map_type type) const;
     };

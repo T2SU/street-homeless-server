@@ -57,7 +57,7 @@ void hl::master::handlers::enter_game_req::handle_packet(master_session &session
     obuf.write(true);
     obuf.write(pid);
     obuf.write(user->get_map_sn());
-
+    
     const auto& data = user->get_player_data();
     obuf.write_str(data.get_map());
     obuf.write_str(data.get_sp());

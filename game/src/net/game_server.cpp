@@ -16,6 +16,7 @@ hl::game::game_server::game_server()
 
 void hl::game::game_server::on_accept(hl::game::game_session *session)
 {
+    uv_tcp_nodelay(session->get_handle(), true);
     LOGI << "Accepted game session from [" << session->get_remote_endpoint() << "]";
 }
 

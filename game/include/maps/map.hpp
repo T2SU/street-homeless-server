@@ -11,6 +11,9 @@
 #pragma once
 #endif
 
+#include "portal.hpp"
+#include "objects/field_object.hpp"
+
 namespace hl::game
 {
     class player;
@@ -22,8 +25,14 @@ namespace hl::game
         const std::string _scene;
         const map_type _type;
 
+        std::unordered_map<uint32_t, portal> _portals;
+        std::vector<portal> _starting_points;
+
         mutable std::mutex _mutex;
         std::unordered_map<uint64_t, std::shared_ptr<player>> _players;
+        std::unordered_map<uint64_t, std::shared_ptr<field_object>> _objects;
+
+        friend class map_factory;
 
     public:
         map(uint32_t map_sn, std::string scene, map_type type);
@@ -33,8 +42,27 @@ namespace hl::game
         map_type get_type() const;
 
         void add_player(const std::shared_ptr<player>& player, const std::string& sp);
+        void send_first_enter(const std::shared_ptr<player> &player);
         void remove_player(uint64_t pid);
+        void on_move_player(const std::shared_ptr<player>& player, in_buffer& in);
+
+    private:
+        const portal& get_portal(const std::string& pt) const;
         std::shared_ptr<player> find_player(uint64_t pid);
+
+        std::shared_ptr<field_object> find_object_no_lock(uint64_t object_id) const;
+
+        inline auto get_objects() const
+        {
+            return _objects | std::views::transform([](const auto& pair){ return pair.second; });
+        }
+
+        inline auto get_players() const
+        {
+            return _players | std::views::transform([](const auto& pair){ return pair.second; });
+        }
+
+        void broadcast(const out_buffer& out, uint64_t exception_pid = 0);
     };
 }
 

@@ -47,7 +47,7 @@ void hl::player_data::load(uint64_t pid, sqlpp::mysql::connection &conn)
                              .where(chr.pid == pid));
     const auto& user_row = user_result.front();
 
-    _data.set_uid(user_row.pid);
+    _data.set_pid(user_row.pid);
     _data.set_uid(user_row.uid);
     _data.set_name(user_row.name);
 

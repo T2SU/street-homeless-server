@@ -37,6 +37,8 @@ void hl::game::mhandlers::enter_game_res::handle_packet(master &session, in_buff
     const auto first_enter = in_buf.read<uint8_t>();
     in_buf.read_pb(pb);
 
+    p->set_state(user_state::connected);
+
     auto map = MAPS.get_map(map_sn);
     if (map == nullptr)
     {
@@ -46,11 +48,9 @@ void hl::game::mhandlers::enter_game_res::handle_packet(master &session, in_buff
         return;
     }
 
-    auto player = std::make_shared<hl::game::player>();
+    auto player = std::make_shared<hl::game::player>(pid, p);
     player->init(pb, map_sn);
     p->set_player(player);
-
-    map->add_player(player, sp);
 
     out.write<uint8_t>(1);
     out.write(pid);
@@ -63,4 +63,7 @@ void hl::game::mhandlers::enter_game_res::handle_packet(master &session, in_buff
         out.write_pb(pb);
     }
     p->write(out);
+
+    map->add_player(player, sp);
+    map->send_first_enter(player);
 }

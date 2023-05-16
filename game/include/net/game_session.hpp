@@ -18,8 +18,9 @@ namespace hl::game
     class game_session : public abstract_session
     {
     private:
-        pb::AccountData _account_data;
         std::shared_ptr<player> _player;
+        user_state _state;
+        bool _migrating_to_another;
 
     public:
         game_session(server* server, uint32_t id, uint32_t socket_sn);
@@ -27,12 +28,17 @@ namespace hl::game
         void on_packet(in_buffer& in_buffer) override;
         void on_close(close_reason reason) override;
         const char* get_type_name() const override;
-        const pb::AccountData& get_account_data() const;
-        void set_account_data(pb::AccountData account_data);
         const std::shared_ptr<player> &get_player() const;
         void set_player(const std::shared_ptr<player> &player);
+        user_state get_state() const;
+        void set_state(user_state state);
+
+        inline bool is_migrating_to_another() const { return _migrating_to_another; }
 
         game_server& get_server();
+
+    private:
+        void try_sign_out();
     };
 }
 

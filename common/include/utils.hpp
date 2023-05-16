@@ -17,5 +17,7 @@
 #include "utils/singleton.hpp"
 #include "utils/synchronized.hpp"
 #include "utils/yaml_config.hpp"
+#include "utils/point.hpp"
+#include "utils/random.hpp"
 
 #endif //STREET_HOMELESS_SERVER_UTILS_HPP
