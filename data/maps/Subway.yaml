@@ -1,0 +1,30 @@
+name: Subway
+portals:
+- type: StartingPoint
+  name: Starting Point 1
+  position:
+    x: -1
+    y: 0.123
+    z: -3.034
+  rotation:
+    x: 0
+    y: -0.8679899
+    z: 0
+    w: 0.4965818
+  target_scene: ''
+  target_portal_name: ''
+  script_name: ''
+- type: StartingPoint
+  name: Starting Point 2
+  position:
+    x: -23.07
+    y: 0.123
+    z: -0.13
+  rotation:
+    x: 0
+    y: -0.6676319
+    z: 0
+    w: -0.7444916
+  target_scene: ''
+  target_portal_name: ''
+  script_name: ''

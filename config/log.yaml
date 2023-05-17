@@ -1,4 +1,4 @@
-max_severity: "verbose" # none
+max_severity: verbose # none
                         # fatal
                         # error
                         # warning

@@ -4,10 +4,10 @@ thread:
 network:
   login:
     bind:
-      address: "0.0.0.0"
+      address: 0.0.0.0
       port: 7675
   inter_server:
-    master_host: "127.0.0.1"
+    master_host: 127.0.0.1
     master_port: 6766
 
 config:

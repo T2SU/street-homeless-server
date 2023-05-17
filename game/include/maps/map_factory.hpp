@@ -30,7 +30,7 @@ namespace hl::game
 
     private:
         static void load_map(hl::game::map& map);
-        static void add_portal_to_map(hl::game::map& map, const portal& portal);
+        static void add_portal_to_map(hl::game::map& map, std::shared_ptr<hl::game::portal> pt);
     };
 }
 

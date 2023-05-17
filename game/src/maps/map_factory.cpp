@@ -5,6 +5,7 @@
 #include "std.hpp"
 #include "maps/map_factory.hpp"
 #include "maps/map.hpp"
+#include "maps/portal.hpp"
 
 hl::game::map_factory::map_factory()
         : _mutex(), _maps()
@@ -56,19 +57,23 @@ hl::game::map *hl::game::map_factory::get_map(uint32_t map)
 
 void hl::game::map_factory::load_map(hl::game::map& map)
 {
-    // 임시 로딩
-    if (map.get_scene() == "Subway")
+    // TODO Redis caching
+
+    const auto data_root = std::filesystem::path(hl::config::data_root);
+    const auto path = data_root / "maps" / map.get_scene();
+
+    const auto node = YAML::LoadFile(path.string() + ".yaml");
+    const auto portals = node["portals"];
+    for (const auto& pt : portals)
     {
-        portal p(1, "sp",
-                 vector3(-1, 0.123f, -3.034),
-                 quaternion(0, -0.8679899, 0, 0.4965818));
-        add_portal_to_map(map, p);
+        auto d = std::make_shared<portal>(pt);
+        add_portal_to_map(map, d);
     }
 }
 
-void hl::game::map_factory::add_portal_to_map(hl::game::map& map, const portal& portal)
+void hl::game::map_factory::add_portal_to_map(hl::game::map& map, std::shared_ptr<portal> pt)
 {
-    map._portals.emplace(portal.get_sn(), portal);
-    if (portal.get_name() == "sp")
-        map._starting_points.push_back(portal);
+    map._portals.emplace(pt->get_name(), pt);
+    if (pt->get_type() == portal_type::starting_point)
+        map._starting_points.push_back(pt);
 }

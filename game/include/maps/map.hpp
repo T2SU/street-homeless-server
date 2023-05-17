@@ -25,8 +25,8 @@ namespace hl::game
         const std::string _scene;
         const map_type _type;
 
-        std::unordered_map<uint32_t, portal> _portals;
-        std::vector<portal> _starting_points;
+        std::unordered_map<std::string, std::shared_ptr<portal>> _portals;
+        std::vector<std::shared_ptr<portal>> _starting_points;
 
         mutable std::mutex _mutex;
         std::unordered_map<uint64_t, std::shared_ptr<player>> _players;
@@ -41,13 +41,13 @@ namespace hl::game
         const std::string &get_scene() const;
         map_type get_type() const;
 
-        void add_player(const std::shared_ptr<player>& player, const std::string& sp);
-        void send_first_enter(const std::shared_ptr<player> &player);
+        void put_on_portal(const std::shared_ptr<player>& player, std::string& sp);
+        void add_player(const std::shared_ptr<player>& player);
         void remove_player(uint64_t pid);
         void on_move_player(const std::shared_ptr<player>& player, in_buffer& in);
 
     private:
-        const portal& get_portal(const std::string& pt) const;
+        std::shared_ptr<hl::game::portal> get_portal(const std::string& pt) const;
         std::shared_ptr<player> find_player(uint64_t pid);
 
         std::shared_ptr<field_object> find_object_no_lock(uint64_t object_id) const;

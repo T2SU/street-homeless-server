@@ -1,4 +1,5 @@
 add_library(HomelessCommon STATIC
+        src/config/config.cpp
         src/net/abstract_session.cpp
         src/net/network_exceptions.cpp
         src/utils/net_tools.cpp
@@ -51,7 +52,7 @@ target_link_libraries(HomelessCommon PUBLIC
         OpenSSL::Crypto
         plog::plog
         yaml-cpp
-        uv_a
+        uv
         sqlpp11::sqlpp11
         PostgreSQL::PostgreSQL
         ${mariadblib}

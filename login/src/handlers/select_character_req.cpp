@@ -74,5 +74,7 @@ void hl::login::handlers::select_character_req::handle_packet(login_session &ses
 {
     if (session.get_account_data().uid() == 0)
         throw std::runtime_error("no session uid");
-    session.get_server().accessor().post<select_character_job>(session.get_socket_sn(), in_buf.read<uint64_t>(), in_buf.read_str());
+    const auto pid = in_buf.read<uint64_t>();
+    const auto device_id = in_buf.read_str();
+    session.get_server().accessor().post<select_character_job>(session.get_socket_sn(), pid, device_id);
 }

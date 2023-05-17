@@ -28,13 +28,18 @@ map_type hl::game::map::get_type() const
     return _type;
 }
 
-void hl::game::map::add_player(const std::shared_ptr<player> &player, const std::string &sp)
+void hl::game::map::put_on_portal(const std::shared_ptr<player>& player, std::string& sp)
 {
     const auto& pt = get_portal(sp);
+    player->set_position(pt->get_pos());
+    player->set_rotation(pt->get_rot());
+    sp = pt->get_name();
+}
+
+void hl::game::map::add_player(const std::shared_ptr<player> &player)
+{
     synchronized(_mutex)
     {
-        player->set_position(pt.get_pos());
-        player->set_rotation(pt.get_rot());
         for (const auto& obj : get_objects())
             player->send_enter(obj);
         for (const auto& p : get_players())
@@ -43,14 +48,6 @@ void hl::game::map::add_player(const std::shared_ptr<player> &player, const std:
             p->send_enter(std::reinterpret_pointer_cast<field_object>(player));
         }
         _players[player->get_pid()] = player;
-    }
-}
-
-void hl::game::map::send_first_enter(const std::shared_ptr<player> &player)
-{
-    synchronized(_mutex)
-    {
-
     }
 }
 
@@ -80,23 +77,26 @@ std::shared_ptr<hl::game::player> hl::game::map::find_player(uint64_t pid)
     return {};
 }
 
-const hl::game::portal &hl::game::map::get_portal(const std::string &pt) const
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "misc-no-recursion"
+std::shared_ptr<hl::game::portal> hl::game::map::get_portal(const std::string &pt) const
 {
-    if (pt == "sp")
+    if (pt.empty())
     {
         return _starting_points[RAND.next<size_t>(_starting_points.size() - 1)];
     }
     else
     {
-        for (const auto& row : _portals)
+        const auto& found = _portals.find(pt);
+        if (found != _portals.end())
         {
-            if (row.second.get_name() == "pt")
-                return row.second;
+            return found->second;
         }
     }
     // fallback invalid name
-    return get_portal("sp");
+    return get_portal("");
 }
+#pragma clang diagnostic pop
 
 std::shared_ptr<hl::game::field_object> hl::game::map::find_object_no_lock(uint64_t object_id) const
 {

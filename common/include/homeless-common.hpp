@@ -12,6 +12,7 @@
 #endif
 
 #include "std_common.hpp"
+#include "config/config.hpp"
 #include "inter.hpp"
 #include "constants.hpp"
 #include "database.hpp"

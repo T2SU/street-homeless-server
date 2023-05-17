@@ -33,7 +33,7 @@ void hl::game::mhandlers::enter_game_res::handle_packet(master &session, in_buff
     const auto pid = in_buf.read<uint64_t>();
     const auto map_sn = in_buf.read<uint32_t>();
     const auto scene = in_buf.read_str();
-    const auto sp = in_buf.read_str();
+    auto pt = in_buf.read_str();
     const auto first_enter = in_buf.read<uint8_t>();
     in_buf.read_pb(pb);
 
@@ -51,12 +51,13 @@ void hl::game::mhandlers::enter_game_res::handle_packet(master &session, in_buff
     auto player = std::make_shared<hl::game::player>(pid, p);
     player->init(pb, map_sn);
     p->set_player(player);
+    map->put_on_portal(player, pt);
 
     out.write<uint8_t>(1);
     out.write(pid);
     out.write(map_sn);
     out.write_str(scene);
-    out.write_str(sp);
+    out.write_str(pt);
     out.write(first_enter);
     if (first_enter)
     {
@@ -64,6 +65,5 @@ void hl::game::mhandlers::enter_game_res::handle_packet(master &session, in_buff
     }
     p->write(out);
 
-    map->add_player(player, sp);
-    map->send_first_enter(player);
+    map->add_player(player);
 }
