@@ -79,6 +79,7 @@ void hl::master::map_state::flush(const std::shared_ptr<change_map_request>& req
         LOGV << "failed to flush change_map_req cause session or user is offline. (pid: " << req->get_pid() << ") [" << _scene << "(" << _map_sn << ")]";
         return;
     }
+    req->get_user()->set_server_idx(session->get_idx());
 
     auto out_buf = req->make_reply(hl::InternalServerMessage_ChangeMapRes);
     out_buf.write(req->get_pid());
