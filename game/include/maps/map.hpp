@@ -45,6 +45,7 @@ namespace hl::game
         void add_player(const std::shared_ptr<player>& player);
         void remove_player(uint64_t pid);
         void on_move_player(const std::shared_ptr<player>& player, in_buffer& in);
+        void on_change_map_req(const std::shared_ptr<player>& player, in_buffer& in);
 
     private:
         std::shared_ptr<hl::game::portal> get_portal(const std::string& pt) const;

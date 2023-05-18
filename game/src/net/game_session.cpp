@@ -60,12 +60,13 @@ void hl::game::game_session::set_state(user_state state)
 
 void hl::game::game_session::try_sign_out()
 {
-    if (_migrating_to_another) return;
-    if (_state != user_state::connected) return;
+    // 맵이 이동하니... 종료 액션은 취함
     if (!_player) return;
-
     _player->on_close();
 
+    // 그러나 단순 맵 이동 등, 로그아웃 요청은 마스터로 보내지 않을 경우들
+    if (_migrating_to_another) return;
+    if (_state != user_state::connected) return;
     out_buffer obuf(hl::InternalClientMessage_SignOutReq);
     obuf.write(_player->get_pid());
     MASTER->write(obuf);

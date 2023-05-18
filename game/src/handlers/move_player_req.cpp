@@ -11,5 +11,8 @@
 void hl::game::handlers::move_player_req::handle_packet(game_session &session, in_buffer &in_buf)
 {
     const auto player = session.get_player();
-    player->get_map()->on_move_player(player, in_buf);
+    if (!player) return;
+    auto map = player->get_map();
+    if (!map) return;
+    map->on_move_player(player, in_buf);
 }

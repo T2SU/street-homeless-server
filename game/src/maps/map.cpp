@@ -5,6 +5,7 @@
 #include "std.hpp"
 #include "maps/map.hpp"
 #include "users/player.hpp"
+#include "net/master.hpp"
 
 hl::game::map::map(uint32_t map_sn, std::string scene, map_type type)
         : _map_sn(map_sn), _scene(std::move(scene)), _type(type)
@@ -134,6 +135,41 @@ void hl::game::map::on_move_player(const std::shared_ptr<player> &player, in_buf
             const auto rot = in.read_pb<pb::Quaternion>();
             player->set_rotation(rot);
         }
+    }
+}
+
+void hl::game::map::on_change_map_req(const std::shared_ptr<player>& player, in_buffer& in)
+{
+    const auto portal_name = in.read_str();
+    const auto pos = in.read_pb<pb::Vector3>();
+    const auto device_id = in.read_str();
+
+    // TODO check player <-> portal distance (anti hacking)
+    const auto& pt = _portals.find(portal_name);
+    if (pt == _portals.end())
+    {
+        out_buffer out(pb::ServerMessage_ChangeMapRes);
+        out.write<uint8_t>(pb::ChangeMapResult_UnknownError);
+        player->get_session()->write(out);
+        return;
+    }
+    if (pt->second->get_type() == portal_type::change_map)
+    {
+        out_buffer req(hl::InternalClientMessage_ChangeMapReq);
+        req.write(player->get_session()->get_socket_sn());
+        req.write_str(device_id);
+        req.write_str(player->get_session()->get_remote_address());
+        req.write(player->get_pid());
+        req.write_str(pt->second->get_target_scene());
+        req.write_str(pt->second->get_target_portal_name());
+        MASTER->write(req);
+    }
+    else if (pt->second->get_type() == portal_type::script) // TODO 아직 미구현..
+    {
+        out_buffer out(pb::ServerMessage_ChangeMapRes);
+        out.write<uint8_t>(pb::ChangeMapResult_InternalServerError);
+        player->get_session()->write(out);
+        return;
     }
 }
 

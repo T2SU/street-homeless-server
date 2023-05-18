@@ -81,7 +81,7 @@ void hl::master::map_state::flush(const std::shared_ptr<change_map_request>& req
     }
 
     auto out_buf = req->make_reply(hl::InternalServerMessage_ChangeMapRes);
-    out_buf.write(user->get_pid());
+    out_buf.write(req->get_pid());
     out_buf.write(success);
     if (success == pb::ChangeMapResult_Success)
     {
@@ -90,7 +90,7 @@ void hl::master::map_state::flush(const std::shared_ptr<change_map_request>& req
         {
             LOGV << "failed to encode map server " << _server_idx;
             out_buf = req->make_reply(hl::InternalServerMessage_ChangeMapRes);
-            out_buf.write(user->get_pid());
+            out_buf.write(req->get_pid());
             out_buf.write(pb::ChangeMapResult_InternalServerError);
         }
     }

@@ -18,7 +18,8 @@ add_executable(HomelessGame
         src/mhandlers/change_map_res.cpp
         src/maps/portal.cpp
         src/objects/field_object.cpp
-        src/handlers/move_player_req.cpp)
+        src/handlers/move_player_req.cpp
+        src/handlers/change_map_req.cpp)
 
 target_include_directories(HomelessGame PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)
 target_link_libraries(HomelessGame HomelessCommon)

@@ -36,6 +36,16 @@ void hl::master::game_world::change_map(const std::shared_ptr<change_map_request
 {
     synchronized (_mutex)
     {
+        // 기존 맵에서 삭제..
+
+        auto user = req->get_user();
+        if (user->get_map_sn() > 0)
+            remove_player(req->get_pid());
+
+
+
+        // 이제 새로운 맵에 추가..
+
         const auto& scene = req->get_scene();
         const auto map_type = get_map_type(scene);
 

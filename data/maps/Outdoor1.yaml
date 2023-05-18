@@ -1,0 +1,30 @@
+name: Outdoor1
+portals:
+- type: StartingPoint
+  name: Starting Point
+  position:
+    x: 6.590945
+    y: 0.59
+    z: 10.87335
+  rotation:
+    x: 0
+    y: 0
+    z: 0
+    w: 1
+  target_scene: ''
+  target_portal_name: ''
+  script_name: ''
+- type: ChangeMap
+  name: Outdoor1 Subway1 Portal
+  position:
+    x: 10.46
+    y: 0.3599999
+    z: 12.57
+  rotation:
+    x: 0
+    y: 0
+    z: 0
+    w: 1
+  target_scene: Subway
+  target_portal_name: Subway Outdoor1 Portal1
+  script_name: ''

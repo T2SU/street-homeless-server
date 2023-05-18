@@ -99,8 +99,10 @@ void hl::master::handlers::change_map_req::handle_packet(master_session &session
         // TODO 게임 서버에서 맵 이동 전, scene, sp 유효성 검사
         auto req = std::make_shared<hl::master::change_map_request>(session.get_socket_sn(), pid, scene, sp, false);
         auto user = req->get_user();
-        user->set_server_idx(0);
-        user->set_player_socket_sn(0);
+
+        // 왜 이거 두개 0으로 해놨었지?
+        user->set_server_idx(session.get_idx());
+        user->set_player_socket_sn(socket_sn);
         user->set_new_map(scene, sp);
         user->set_state(user_state::migrating);
         GAME_WORLD.change_map(req);

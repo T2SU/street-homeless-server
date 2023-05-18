@@ -29,7 +29,7 @@ namespace hl::master
     private:
         using store_map_type = std::unordered_map<std::string, std::shared_ptr<map_state>>;
 
-        mutable std::mutex _mutex;
+        mutable std::recursive_mutex _mutex;
         std::unordered_map<uint32_t, std::shared_ptr<map_state>> _maps; // key: map sn
         store_map_type _fields;    // key: map scene
         store_map_type _instances; // key: map scene, value: acceptable instance
