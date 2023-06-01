@@ -14,6 +14,6 @@
 #include <homeless-common.hpp>
 
 #define MASTER hl::singleton<std::shared_ptr<hl::game::master>>::get()
-#define MAPS hl::singleton<::hl::game::map_factory>::get()
+#define REGIONS hl::singleton<::hl::game::region_man>::get()
 
 #endif //STREET_HOMELESS_SERVER_STD_HPP

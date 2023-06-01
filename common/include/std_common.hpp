@@ -57,6 +57,9 @@
 #include "utils/point.hpp"
 #include "constants.hpp"
 
+#include "resources/map_data.hpp"
+#include "resources/region_info.hpp"
+
 #undef min
 #undef max
 #include <sqlpp11/postgresql/postgresql.h>

@@ -9,7 +9,7 @@ hl::master::hangout::hangout()
         : _mutex(), _users()
 {}
 
-std::shared_ptr<hl::master::user_record> hl::master::hangout::find_user(uint64_t pid) const
+std::shared_ptr<hl::master::user_record> hl::master::hangout::find_user(player_id_t pid) const
 {
     synchronized (_mutex)
     {
@@ -28,7 +28,7 @@ void hl::master::hangout::add_user(std::shared_ptr<user_record> user)
     }
 }
 
-void hl::master::hangout::remove_user(uint64_t pid)
+void hl::master::hangout::remove_user(player_id_t pid)
 {
     synchronized (_mutex)
     {

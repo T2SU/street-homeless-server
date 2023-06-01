@@ -4,19 +4,20 @@
 
 
 #include "std.hpp"
-#include "handlers/enter_game_req.hpp"
+#include "handlers/on_migrate_req.hpp"
 #include "users/user_record.hpp"
 #include "world/hangout.hpp"
+#include "world/region.hpp"
 
 static void send_error(hl::master::master_session &session, uint32_t socket_sn)
 {
-    out_buffer obuf(hl::InternalServerMessage_EnterGameRes);
+    out_buffer obuf(hl::InternalServerMessage_OnMigrateRes);
     obuf.write(socket_sn);
     obuf.write(false);
     session.write(obuf);
 }
 
-void hl::master::handlers::enter_game_req::handle_packet(master_session &session, in_buffer &in_buf)
+void hl::master::handlers::on_migrate_req::handle_packet(master_session &session, in_buffer &in_buf)
 {
     const auto socket_sn = in_buf.read<uint32_t>();
     const auto device_id = in_buf.read_str();
@@ -53,11 +54,11 @@ void hl::master::handlers::enter_game_req::handle_packet(master_session &session
     user->set_server_idx(session.get_idx());
     user->set_state(user_state::connected);
 
-    out_buffer obuf(hl::InternalServerMessage_EnterGameRes);
+    out_buffer obuf(hl::InternalServerMessage_OnMigrateRes);
     obuf.write(socket_sn);
     obuf.write(true);
     obuf.write(pid);
-    obuf.write(user->get_map_sn());
+    obuf.write(user->get_region()->get_region_sn());
     
     const auto& data = user->get_player_data();
     obuf.write_str(data.get_map());

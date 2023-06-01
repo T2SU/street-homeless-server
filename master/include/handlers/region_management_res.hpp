@@ -1,9 +1,9 @@
 //
-// Created by TSU on 2023-05-13.
+// Created by T2SU on 2023/05/15.
 //
 
-#ifndef STREET_HOMELESS_SERVER_ENTER_WORLD_REQ_HPP
-#define STREET_HOMELESS_SERVER_ENTER_WORLD_REQ_HPP
+#ifndef STREET_HOMELESS_SERVER_934F6D6D885649E9B1CDAEA138FD9296
+#define STREET_HOMELESS_SERVER_934F6D6D885649E9B1CDAEA138FD9296
 
 #if defined(_MSC_VER) || \
     (defined(__GNUC__) && (__GNUC__ == 3 && __GNUC_MINOR__ >= 4) || \
@@ -17,11 +17,11 @@
 
 namespace hl::master::handlers
 {
-    struct change_map_req : public hl::packet_handler<master_session>
+    struct region_management_res : public hl::packet_handler<master_session>
     {
     public:
         void handle_packet(master_session &session, in_buffer &in_buf) override;
     };
 }
 
-#endif //STREET_HOMELESS_SERVER_ENTER_WORLD_REQ_HPP
+#endif //STREET_HOMELESS_SERVER_934F6D6D885649E9B1CDAEA138FD9296

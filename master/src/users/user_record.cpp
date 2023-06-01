@@ -2,10 +2,11 @@
 // Created by TSU on 2023-05-14.
 //
 
+#include <memory>
 #include "std.hpp"
 #include "users/user_record.hpp"
 
-hl::master::user_record::user_record(uint32_t server_idx, uint32_t socket_sn, uint64_t pid, std::string device_id, std::string remote_address)
+hl::master::user_record::user_record(server_idx_t server_idx, socket_sn_t socket_sn, player_id_t pid, std::string device_id, std::string remote_address)
         : _pid(pid)
         , _server_idx(server_idx)
         , _socket_sn(socket_sn)
@@ -13,7 +14,7 @@ hl::master::user_record::user_record(uint32_t server_idx, uint32_t socket_sn, ui
         , _player_data()
         , _db_job_state(db_job_state::waiting)
         , _jobs()
-        , _map_sn()
+        , _region()
         , _mutex()
         , _device_id(std::move(device_id))
         , _remote_address(std::move(remote_address))
@@ -65,14 +66,14 @@ void hl::master::user_record::process_db_job(sqlpp::mysql::connection &conn)
     }
 }
 
-uint32_t hl::master::user_record::get_map_sn() const
+std::shared_ptr<hl::master::region> hl::master::user_record::get_region() const
 {
-    return _map_sn;
+    return _region;
 }
 
-void hl::master::user_record::set_map_sn(uint32_t map_sn)
+void hl::master::user_record::set_region(std::shared_ptr<region> region)
 {
-    _map_sn = map_sn;
+    _region = std::move(region);
 }
 
 const std::string &hl::master::user_record::get_device_id() const

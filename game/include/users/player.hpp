@@ -29,7 +29,7 @@ namespace hl::game
         int32_t _money;
         std::vector<item> _inventory;
         std::string _name;
-        uint32_t _map_sn;
+        map* _map;
 
         vector3 _position;
         quaternion _rotation;
@@ -39,7 +39,7 @@ namespace hl::game
     public:
         player(uint64_t pid, const std::shared_ptr<game_session> session);
 
-        void init(pb::PlayerData& data, uint32_t map_sn);
+        void init(pb::PlayerData& data, map* map);
         void on_close();
 
         uint64_t get_pid() const;
@@ -47,7 +47,7 @@ namespace hl::game
         const std::string &get_name() const;
         std::shared_ptr<game_session> get_session() const;
         map* get_map() const;
-        uint32_t get_map_id() const;
+        void set_map(map *map);
 
         const vector3 &get_position() const;
         void set_position(vector3 position);

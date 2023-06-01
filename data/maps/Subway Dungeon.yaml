@@ -1,0 +1,33 @@
+name: Subway Dungeon
+region_id: 1
+region_name: 3호선 고길역
+map_name: 내부
+portals:
+- type: ChangeMap
+  name: Exit Portal
+  position:
+    x: 1.537121
+    y: 0.07499981
+    z: 3.4605
+  rotation:
+    x: 0
+    y: 0
+    z: 0
+    w: 1
+  target_scene: Subway
+  target_portal_name: Entrance Dungeon
+  script_name: ''
+- type: StartingPoint
+  name: Starting Point 1
+  position:
+    x: 1.92
+    y: 0.123
+    z: 4.82
+  rotation:
+    x: 0
+    y: -0.8679899
+    z: 0
+    w: 0.4965818
+  target_scene: ''
+  target_portal_name: ''
+  script_name: ''

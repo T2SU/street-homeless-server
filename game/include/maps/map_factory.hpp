@@ -18,17 +18,24 @@ namespace hl::game
     class map_factory
     {
     private:
+        const region_id_t _id;
+        const region_sn_t _sn;
+
         std::mutex _mutex;
-        std::unordered_map<uint32_t, std::unique_ptr<map>> _maps;
+        std::unordered_map<std::string, std::unique_ptr<map>> _maps;
 
     public:
-        map_factory();
+        map_factory(region_id_t id, region_sn_t sn);
 
-        bool create_map(uint32_t map_sn, const std::string& scene, map_type type);
-        void remove_map(uint32_t map_sn);
-        map* get_map(uint32_t map);
+        map* get_map(const std::string& scene);
+
+        [[nodiscard]] region_id_t get_region_id() const;
+        [[nodiscard]] region_sn_t get_region_sn() const;
 
     private:
+        bool create_map(const std::string& scene);
+        void remove_map(const std::string& scene);
+
         static void load_map(hl::game::map& map);
         static void add_portal_to_map(hl::game::map& map, std::shared_ptr<hl::game::portal> pt);
     };

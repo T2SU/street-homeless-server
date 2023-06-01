@@ -16,9 +16,9 @@ namespace hl
     enum InternalServerMessage : uint16_t
     {
         InternalServerMessage_SetUpRes,
-        InternalServerMessage_EnterGameRes,
-        InternalServerMessage_ChangeMapRes,
-        InternalServerMessage_MapManagementReq,
+        InternalServerMessage_OnMigrateRes,
+        InternalServerMessage_MigrateRegionRes,
+        InternalServerMessage_RegionManagementReq,
 
         InternalServerMessage_Max
     };
@@ -26,10 +26,10 @@ namespace hl
     enum InternalClientMessage : uint16_t
     {
         InternalClientMessage_SetUpReq,
-        InternalClientMessage_EnterGameReq,
-        InternalClientMessage_ChangeMapReq,
+        InternalClientMessage_OnMigrateReq,
+        InternalClientMessage_MigrateRegionReq,
         InternalClientMessage_LogoutReq,
-        InternalClientMessage_MapManagementRes,
+        InternalClientMessage_RegionManagementRes,
         InternalClientMessage_SignOutReq,
 
         InternalClientMessage_Max

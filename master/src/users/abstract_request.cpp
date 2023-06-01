@@ -9,7 +9,7 @@
 #include "users/abstract_request.hpp"
 #include "world/hangout.hpp"
 
-hl::master::abstract_request::abstract_request(uint32_t master_socket_sn, uint64_t pid)
+hl::master::abstract_request::abstract_request(socket_sn_t master_socket_sn, player_id_t pid)
     : _master_socket_sn(master_socket_sn), _pid(pid)
 {
 }

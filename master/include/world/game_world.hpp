@@ -11,14 +11,14 @@
 #pragma once
 #endif
 
-#include "world/map_state.hpp"
-#include "users/change_map_request.hpp"
+#include "world/region.hpp"
+#include "users/migration_region_request.hpp"
 
 namespace hl::master
 {
     struct game_world_dimension
     {
-        std::unordered_map<uint32_t, std::shared_ptr<map_state>> maps; // key: map_sn
+        std::unordered_map<region_sn_t, std::shared_ptr<region>> regions;
         uint32_t flag;
 
         [[nodiscard]] size_t calc_population() const;
@@ -27,34 +27,31 @@ namespace hl::master
     class game_world
     {
     private:
-        using store_map_type = std::unordered_map<std::string, std::shared_ptr<map_state>>;
+        using store_region_t = std::unordered_map<region_id_t, std::map<channel_id_t, std::shared_ptr<region>>>;
 
         mutable std::recursive_mutex _mutex;
-        std::unordered_map<uint32_t, std::shared_ptr<map_state>> _maps; // key: map sn
-        store_map_type _fields;    // key: map scene
-        store_map_type _instances; // key: map scene, value: acceptable instance
-        std::unordered_map<uint32_t, game_world_dimension> _maps_of_servers; // key: server_idx
+        store_region_t _regions;    // key: region_id_t -> channel_id_t
+        std::unordered_map<server_idx_t, game_world_dimension> _dimensions; // key: server_idx
 
-        uint32_t _sn_counter;
+        region_sn_t _sn_counter;
 
     public:
         game_world();
 
-        void change_map(const std::shared_ptr<change_map_request>& req);
-        void on_after_creation(uint32_t server_idx, uint32_t map_sn, bool success);
-        void remove_player(uint64_t pid);
+        void migrate_region(const std::shared_ptr<migration_region_request>& req);
+        void on_after_creation(server_idx_t server_idx, region_sn_t region_sn, bool success);
+        void remove_player(player_id_t pid);
 
-        void add_server(uint32_t server_idx, uint32_t flag);
-        void remove_server(uint32_t server_idx);
+        void add_server(server_idx_t server_idx, uint32_t flag);
+        void remove_server(server_idx_t server_idx);
 
     private:
-        std::shared_ptr<map_state> create_map(const std::shared_ptr<change_map_request>& req);
+        void put_region_to_game_world(const std::shared_ptr<region>& region);
+        void remove_region(const std::shared_ptr<region>& region);
 
-        void put_map(const std::shared_ptr<map_state>& map);
-        void request_map_creation(const std::shared_ptr<map_state>& map);
-        void remove_map(std::shared_ptr<map_state> map);
+        server_idx_t retrieve_server_for_region(region_type type) const;
 
-        uint32_t retrieve_server_for_map(map_type type) const;
+        static void request_region_creation(const std::shared_ptr<region>& region);
     };
 }
 

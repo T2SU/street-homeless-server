@@ -19,14 +19,14 @@ namespace hl::master
     {
     private:
         mutable std::mutex _mutex;
-        std::unordered_map<uint64_t, std::shared_ptr<user_record>> _users;
+        std::unordered_map<player_id_t, std::shared_ptr<user_record>> _users;
 
     public:
         hangout();
 
-        std::shared_ptr<user_record> find_user(uint64_t pid) const;
+        std::shared_ptr<user_record> find_user(player_id_t pid) const;
         void add_user(std::shared_ptr<user_record> user);
-        void remove_user(uint64_t pid);
+        void remove_user(player_id_t pid);
     };
 }
 

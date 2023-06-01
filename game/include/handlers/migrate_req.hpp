@@ -2,8 +2,8 @@
 // Created by TSU on 2023-05-14.
 //
 
-#ifndef STREET_HOMELESS_SERVER_21D50949277F417BA90E60B39DE9DE09
-#define STREET_HOMELESS_SERVER_21D50949277F417BA90E60B39DE9DE09
+#ifndef STREET_HOMELESS_SERVER_CA22223A8F1E4657B5FC8A77AA83750A
+#define STREET_HOMELESS_SERVER_CA22223A8F1E4657B5FC8A77AA83750A
 
 #if defined(_MSC_VER) || \
     (defined(__GNUC__) && (__GNUC__ == 3 && __GNUC_MINOR__ >= 4) || \
@@ -17,11 +17,11 @@
 
 namespace hl::game::handlers
 {
-    struct enter_game_world_req : public hl::packet_handler<game_session>
+    struct migrate_req : public hl::packet_handler<game_session>
     {
     public:
         void handle_packet(game_session &session, in_buffer &in_buf) override;
     };
 }
 
-#endif //STREET_HOMELESS_SERVER_21D50949277F417BA90E60B39DE9DE09
+#endif //STREET_HOMELESS_SERVER_CA22223A8F1E4657B5FC8A77AA83750A

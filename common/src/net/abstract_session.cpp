@@ -203,7 +203,7 @@ void hl::abstract_session::do_socket_op()
                 }
                 catch (const std::exception& ex)
                 {
-                    LOGE << "error on handling packet from (" << get_remote_endpoint() << "). dump=[" << job.in_buffer->dump_packet() << "]";
+                    LOGE << "error on handling packet from (" << get_remote_endpoint() << "). (what: " << ex.what() << ") dump=[" << job.in_buffer->dump_packet() << "]";
                     if (_server && ++_packet_error_count >= _server->get_packet_error_threshold())
                     {
                         LOGW << "too many packet error from (" << get_remote_endpoint() << "). disconnect session forcely.";

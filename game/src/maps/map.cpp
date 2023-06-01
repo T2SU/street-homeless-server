@@ -6,17 +6,13 @@
 #include "maps/map.hpp"
 #include "users/player.hpp"
 #include "net/master.hpp"
+#include "maps/region_man.hpp"
 
-hl::game::map::map(uint32_t map_sn, std::string scene, map_type type)
-        : _map_sn(map_sn), _scene(std::move(scene)), _type(type)
+hl::game::map::map(std::string scene, region_id_t id, region_sn_t sn)
+        : _scene(std::move(scene)), _region_id(id), _region_sn(sn)
         , _portals(), _starting_points()
         , _mutex(), _players(), _objects()
 {
-}
-
-uint32_t hl::game::map::get_map_sn() const
-{
-    return _map_sn;
 }
 
 const std::string &hl::game::map::get_scene() const
@@ -24,9 +20,14 @@ const std::string &hl::game::map::get_scene() const
     return _scene;
 }
 
-map_type hl::game::map::get_type() const
+region_id_t hl::game::map::get_region_id() const
 {
-    return _type;
+    return _region_id;
+}
+
+region_sn_t hl::game::map::get_region_sn() const
+{
+    return _region_sn;
 }
 
 void hl::game::map::put_on_portal(const std::shared_ptr<player>& player, std::string& sp)
@@ -155,14 +156,15 @@ void hl::game::map::on_change_map_req(const std::shared_ptr<player>& player, in_
     }
     if (pt->second->get_type() == portal_type::change_map)
     {
-        out_buffer req(hl::InternalClientMessage_ChangeMapReq);
-        req.write(player->get_session()->get_socket_sn());
-        req.write_str(device_id);
-        req.write_str(player->get_session()->get_remote_address());
-        req.write(player->get_pid());
-        req.write_str(pt->second->get_target_scene());
-        req.write_str(pt->second->get_target_portal_name());
-        MASTER->write(req);
+        const auto& target_data = hl::singleton<map_data_s>::get().get(pt->second->get_target_scene());
+        if (target_data.get_region_id() != _region_id)
+        {
+            request_migrate_region(player, pt->second, device_id);
+        }
+        else
+        {
+            change_map_local(player, pt->second);
+        }
     }
     else if (pt->second->get_type() == portal_type::script) // TODO 아직 미구현..
     {
@@ -175,10 +177,52 @@ void hl::game::map::on_change_map_req(const std::shared_ptr<player>& player, in_
 
 void hl::game::map::broadcast(const out_buffer& out, uint64_t exception_pid)
 {
-    for (auto player : get_players())
+    for (auto& player : get_players())
     {
         if (player->get_pid() == exception_pid)
             continue;
         player->get_session()->write(out);
     }
+}
+
+void hl::game::map::change_map_local(const std::shared_ptr<player> &player, const std::shared_ptr<portal> &pt) const
+{
+    out_buffer out(pb::ServerMessage_SetMap);
+    auto map = REGIONS.get(get_region_sn())->maps().get_map(pt->get_target_scene());
+    if (map == nullptr)
+    {
+        out_buffer e(pb::ServerMessage_ChangeMapRes);
+        e.write<uint8_t>(pb::ChangeMapResult_UnknownError);
+        player->get_session()->write(e);
+        return;
+    }
+    auto pt_name = pt->get_target_portal_name();
+
+    auto previous_map = player->get_map();
+    if (previous_map != nullptr)
+        previous_map->remove_player(player->get_pid());
+
+    player->set_map(map);
+    map->put_on_portal(player, pt_name);
+    map->add_player(player);
+
+    out.write<uint8_t>(1); // success
+    out.write(player->get_pid());
+    out.write_str(map->get_scene());
+    out.write_str(pt_name);
+    out.write<uint8_t>(0); // first enter
+    player->get_session()->write(out);
+}
+
+
+void hl::game::map::request_migrate_region(const std::shared_ptr<player>& player, const std::shared_ptr<portal>& pt, const std::string& device_id)
+{
+    out_buffer req(hl::InternalClientMessage_MigrateRegionReq);
+    req.write(player->get_session()->get_socket_sn());
+    req.write_str(device_id);
+    req.write_str(player->get_session()->get_remote_address());
+    req.write(player->get_pid());
+    req.write_str(pt->get_target_scene());
+    req.write_str(pt->get_target_portal_name());
+    MASTER->write(req);
 }

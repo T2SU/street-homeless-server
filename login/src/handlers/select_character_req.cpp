@@ -43,7 +43,7 @@ public:
             }
             else
             {
-                out_buffer req(hl::InternalClientMessage_ChangeMapReq);
+                out_buffer req(hl::InternalClientMessage_MigrateRegionReq);
                 req.write(session->get_socket_sn());
                 req.write_str(_device_id);
                 req.write_str(session->get_remote_address());

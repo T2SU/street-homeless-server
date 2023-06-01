@@ -21,7 +21,10 @@ add_library(HomelessCommon STATIC
         src/net/connector.cpp
         src/users/player_data.cpp
         src/utils/point.cpp
-        src/utils/random.cpp)
+        src/utils/random.cpp
+        src/resources/map_data.cpp
+        src/resources/abstract_data.cpp
+        src/resources/region_info.cpp)
 
 include(FindOpenSSL)
 find_package(OpenSSL REQUIRED)

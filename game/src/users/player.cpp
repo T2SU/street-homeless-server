@@ -15,20 +15,20 @@ hl::game::player::player(uint64_t pid, const std::shared_ptr<game_session> sessi
     , _money()
     , _inventory()
     , _name()
-    , _map_sn()
+    , _map()
     , _position()
     , _rotation()
     , _session(session)
 {
 }
 
-void hl::game::player::init(pb::PlayerData &data, uint32_t map_sn)
+void hl::game::player::init(pb::PlayerData &data, map* map)
 {
     _pid = data.pid();
     _object_id = data.pid();
     _uid = data.uid();
     _name = data.name();
-    _map_sn = map_sn;
+    _map = map;
     _stat.init(data);
     init_inventory(data);
 }
@@ -132,12 +132,12 @@ void hl::game::player::send_leave(const std::shared_ptr<field_object>& obj)
 // 따라서 이론적으로, 해당 맵에 아무도 없다는 것이 보장될 수 있음. 따라서 공유 포인터를 받을 필요가 없고 unique_ptr로 처리 가능.
 hl::game::map* hl::game::player::get_map() const
 {
-    return MAPS.get_map(_map_sn);
+    return _map;
 }
 
-uint32_t hl::game::player::get_map_id() const
+void hl::game::player::set_map(hl::game::map *map)
 {
-    return _map_sn;
+    _map = map;
 }
 
 std::string hl::game::player::to_string() const

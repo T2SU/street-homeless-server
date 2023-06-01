@@ -4,10 +4,10 @@
 
 
 #include "std.hpp"
-#include "handlers/map_management_res.hpp"
+#include "handlers/region_management_res.hpp"
 #include "world/game_world.hpp"
 
-void hl::master::handlers::map_management_res::handle_packet(master_session &session, in_buffer &in_buf)
+void hl::master::handlers::region_management_res::handle_packet(master_session &session, in_buffer &in_buf)
 {
     const auto map_sn = in_buf.read<uint32_t>();
     const auto success = in_buf.read<bool>();

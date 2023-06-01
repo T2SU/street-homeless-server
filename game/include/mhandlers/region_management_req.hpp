@@ -2,8 +2,8 @@
 // Created by TSU on 2023-05-14.
 //
 
-#ifndef STREET_HOMELESS_SERVER_AD9673CD0AC84335A16B3B120F40A88D
-#define STREET_HOMELESS_SERVER_AD9673CD0AC84335A16B3B120F40A88D
+#ifndef STREET_HOMELESS_SERVER_BF8C16EA85554D16A61F6314AE044F0B
+#define STREET_HOMELESS_SERVER_BF8C16EA85554D16A61F6314AE044F0B
 
 #if defined(_MSC_VER) || \
     (defined(__GNUC__) && (__GNUC__ == 3 && __GNUC_MINOR__ >= 4) || \
@@ -17,11 +17,11 @@
 
 namespace hl::game::mhandlers
 {
-    struct map_management_req : public hl::packet_handler<master>
+    struct region_management_req : public hl::packet_handler<master>
     {
     public:
         void handle_packet(master &session, in_buffer &in_buf) override;
     };
 }
 
-#endif //STREET_HOMELESS_SERVER_AD9673CD0AC84335A16B3B120F40A88D
+#endif //STREET_HOMELESS_SERVER_BF8C16EA85554D16A61F6314AE044F0B

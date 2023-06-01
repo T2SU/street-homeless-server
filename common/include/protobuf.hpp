@@ -28,5 +28,6 @@
 #include "player_move.pb.h"
 #include "vector3.pb.h"
 #include "quaternion.pb.h"
+#include "migrate_command_result.pb.h"
 
 #endif //STREET_HOMELESS_SERVER_EFE8BF2D16A4418DA084F69C5DF0B8AB

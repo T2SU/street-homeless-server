@@ -1,4 +1,7 @@
 name: Subway
+region_id: 0
+region_name: 서울시 강봉구
+map_name: 고길역
 portals:
 - type: ChangeMap
   name: Subway Outdoor1 Portal1
@@ -6,13 +9,23 @@ portals:
     x: -24.14
     y: 0
     z: -0.42
-  rotation:
+  rotation: &o0
     x: 0
     y: 0
     z: 0
     w: 1
   target_scene: Outdoor1
   target_portal_name: Outdoor1 Subway1 Portal
+  script_name: ''
+- type: ChangeMap
+  name: Entrance Dungeon
+  position:
+    x: 0.63
+    y: 0.07500029
+    z: 5.218889
+  rotation: *o0
+  target_scene: Subway Dungeon
+  target_portal_name: Exit Portal
   script_name: ''
 - type: StartingPoint
   name: Starting Point 1

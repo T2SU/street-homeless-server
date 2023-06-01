@@ -4,9 +4,9 @@
 
 #include "std.hpp"
 #include "net/master_session.hpp"
-#include "users/change_map_request.hpp"
+#include "users/migration_region_request.hpp"
 
-hl::master::change_map_request::change_map_request(uint32_t master_socket_sn, uint64_t pid, std::string scene, std::string sp, bool first_enter)
+hl::master::migration_region_request::migration_region_request(socket_sn_t master_socket_sn, player_id_t pid, std::string scene, std::string sp, bool first_enter)
     : abstract_request(master_socket_sn, pid)
     , _scene(std::move(scene))
     , _sp(std::move(sp))

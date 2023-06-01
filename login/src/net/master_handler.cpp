@@ -9,7 +9,7 @@
 hl::login::master_handler::master_handler()
     : _handlers()
 {
-    _handlers[hl::InternalServerMessage_ChangeMapRes] = std::make_unique<hl::login::mhandlers::change_map_res>();
+    _handlers[hl::InternalServerMessage_MigrateRegionRes] = std::make_unique<hl::login::mhandlers::change_map_res>();
 }
 
 void hl::login::master_handler::process(hl::login::master &session, in_buffer &in_buf)

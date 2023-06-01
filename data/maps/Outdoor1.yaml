@@ -1,4 +1,7 @@
 name: Outdoor1
+region_id: 0
+region_name: 서울시 강봉구
+map_name: 고길동 1구역
 portals:
 - type: StartingPoint
   name: Starting Point

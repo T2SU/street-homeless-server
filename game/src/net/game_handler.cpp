@@ -5,7 +5,7 @@
 #include "net/game_session.hpp"
 #include "net/game_handler.hpp"
 #include "handlers/check_alive_res.hpp"
-#include "handlers/enter_game_world_req.hpp"
+#include "handlers/migrate_req.hpp"
 #include "handlers/move_player_req.hpp"
 #include "handlers/change_map_req.hpp"
 
@@ -13,9 +13,9 @@ hl::game::game_handler::game_handler()
     : _handlers()
 {
     _handlers[pb::ClientMessage_CheckAliveRes] = std::make_unique<hl::game::handlers::check_alive_res>();
-    _handlers[pb::ClientMessage_EnterGameWorldReq] = std::make_unique<hl::game::handlers::enter_game_world_req>();
+    _handlers[pb::ClientMessage_MigrateReq] = std::make_unique<hl::game::handlers::migrate_req>();
     _handlers[pb::ClientMessage_MovePlayerReq] = std::make_unique<hl::game::handlers::move_player_req>();
-    _handlers[pb::ClientMessage_ChangeMapReq] = std::make_unique<hl::game::handlers::change_map_req>();
+    _handlers[pb::ClientMessage_ChangeMapReq] = std::make_unique<hl::game::handlers::migrate_region_req>();
 }
 
 void hl::game::game_handler::process(hl::game::game_session &session, in_buffer &in_buf)
@@ -26,7 +26,7 @@ void hl::game::game_handler::process(hl::game::game_session &session, in_buffer 
     {
         throw std::runtime_error("Unknown packet type " + std::to_string(packet));
     }
-    if (packet != pb::ClientMessage_EnterGameWorldReq && packet != pb::ClientMessage_CheckAliveRes)
+    if (packet != pb::ClientMessage_MigrateReq && packet != pb::ClientMessage_CheckAliveRes)
     {
         if (session.is_migrating_to_another())
         {

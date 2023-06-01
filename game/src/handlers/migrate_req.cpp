@@ -4,10 +4,10 @@
 
 
 #include "std.hpp"
-#include "handlers/enter_game_world_req.hpp"
+#include "handlers/migrate_req.hpp"
 #include "net/master.hpp"
 
-void hl::game::handlers::enter_game_world_req::handle_packet(game_session &session, in_buffer &in_buf)
+void hl::game::handlers::migrate_req::handle_packet(game_session &session, in_buffer &in_buf)
 {
     const auto device_id = in_buf.read_str();
     const auto pid = in_buf.read<uint64_t>();
@@ -19,7 +19,7 @@ void hl::game::handlers::enter_game_world_req::handle_packet(game_session &sessi
         return;
     }
 
-    out_buffer obuf(hl::InternalClientMessage_EnterGameReq);
+    out_buffer obuf(hl::InternalClientMessage_OnMigrateReq);
     obuf.write(session.get_socket_sn());
     obuf.write_str(device_id);
     obuf.write_str(session.get_remote_address());

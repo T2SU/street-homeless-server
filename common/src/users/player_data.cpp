@@ -16,7 +16,7 @@ hl::player_data::~player_data()
 }
 
 
-void hl::player_data::load(uint64_t pid, sqlpp::mysql::connection &conn)
+void hl::player_data::load(player_id_t pid, sqlpp::mysql::connection &conn)
 {
     db::Characters chr{};
 

@@ -1,3 +1,5 @@
+# Scrapped from URL: [https://github.com/babelouest/hoel/blob/master/cmake-modules/FindMariaDB.cmake] (LGPL-2.1)
+
 #
 # FindMariaDB.cmake
 #

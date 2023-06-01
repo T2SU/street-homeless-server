@@ -19,16 +19,16 @@ namespace hl::master
     class abstract_request
     {
     private:
-        const uint32_t _master_socket_sn;
-        const uint64_t _pid;
+        const socket_sn_t _master_socket_sn;
+        const player_id_t _pid;
 
     public:
-        abstract_request(uint32_t master_socket_sn, uint64_t pid);
+        abstract_request(socket_sn_t master_socket_sn, player_id_t pid);
 
         [[nodiscard]] std::shared_ptr<master_session> get_session() const;
         [[nodiscard]] std::shared_ptr<user_record> get_user() const;
 
-        [[nodiscard]] inline uint64_t get_pid() const { return _pid; }
+        [[nodiscard]] inline player_id_t get_pid() const { return _pid; }
 
         [[nodiscard]] out_buffer make_reply(hl::InternalServerMessage msg) const;
     };

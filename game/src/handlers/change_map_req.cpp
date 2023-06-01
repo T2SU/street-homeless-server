@@ -8,7 +8,7 @@
 #include "users/player.hpp"
 #include "maps/map.hpp"
 
-void hl::game::handlers::change_map_req::handle_packet(game_session &session, in_buffer &in_buf)
+void hl::game::handlers::migrate_region_req::handle_packet(game_session &session, in_buffer &in_buf)
 {
     const auto player = session.get_player();
     if (!player) return;

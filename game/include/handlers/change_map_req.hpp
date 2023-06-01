@@ -17,7 +17,7 @@
 
 namespace hl::game::handlers
 {
-    struct change_map_req : public hl::packet_handler<game_session>
+    struct migrate_region_req : public hl::packet_handler<game_session>
     {
     public:
         void handle_packet(game_session &session, in_buffer &in_buf) override;

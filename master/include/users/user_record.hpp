@@ -16,34 +16,34 @@
 
 namespace hl::master
 {
-    class map_state;
+    class region;
 
     class user_record
     {
     private:
-        const uint64_t _pid;
-        uint32_t _server_idx;
-        uint32_t _socket_sn;
+        const player_id_t _pid;
+        server_idx_t _server_idx;
+        socket_sn_t _socket_sn;
         player_data _player_data;
         user_state _state;
         db_job_state _db_job_state;
         std::queue<std::shared_ptr<hl::database::job>> _jobs;
-        uint32_t _map_sn;
+        std::shared_ptr<region> _region;
         std::mutex _mutex;
         std::string _device_id;
         std::string _remote_address;
         size_t _migration_count;
 
     public:
-        user_record(uint32_t server_idx, uint32_t socket_sn, uint64_t pid, std::string device_id, std::string remote_address);
+        user_record(server_idx_t server_idx, socket_sn_t socket_sn, player_id_t pid, std::string device_id, std::string remote_address);
 
-        inline uint64_t get_pid() const { return _pid; }
+        inline player_id_t get_pid() const { return _pid; }
 
-        inline void set_server_idx(uint32_t server_idx) { _server_idx = server_idx; }
-        inline void set_player_socket_sn(uint32_t socket_sn) { _socket_sn = socket_sn; }
-        inline uint32_t get_server_idx() const {return _server_idx; }
-        inline uint32_t get_player_socket_sn() const { return _socket_sn; }
-        inline size_t inc_migration_count() { return _migration_count; }
+        inline void set_server_idx(server_idx_t server_idx) { _server_idx = server_idx; }
+        inline void set_player_socket_sn(socket_sn_t socket_sn) { _socket_sn = socket_sn; }
+        inline server_idx_t get_server_idx() const {return _server_idx; }
+        inline socket_sn_t get_player_socket_sn() const { return _socket_sn; }
+        inline size_t inc_migration_count() { return _migration_count++; }
 
         const player_data &get_player_data() const;
         void set_player_data(player_data&& player_data);
@@ -52,8 +52,8 @@ namespace hl::master
         user_state get_state() const;
         void set_state(user_state state);
 
-        uint32_t get_map_sn() const;
-        void set_map_sn(uint32_t map_sn);
+        std::shared_ptr<region> get_region() const;
+        void set_region(std::shared_ptr<region> region);
 
         const std::string &get_device_id() const;
         const std::string &get_remote_address() const;

@@ -6,25 +6,25 @@
 #include <utility>
 
 #include "std.hpp"
-#include "handlers/change_map_req.hpp"
+#include "handlers/migrate_region_req.hpp"
 #include "users/user_record.hpp"
 #include "world/game_world.hpp"
 #include "world/hangout.hpp"
-#include "users/change_map_request.hpp"
+#include "users/migration_region_request.hpp"
 
 class first_load_player_job : public hl::database::job
 {
 private:
-    const uint32_t _master_socket_sn;
-    const uint32_t _socket_sn;
+    const socket_sn_t _master_socket_sn;
+    const socket_sn_t _socket_sn;
     const std::string _device_id;
     const std::string _remote_address;
-    const uint64_t _pid;
+    const player_id_t _pid;
 
 private:
     void send_error(std::shared_ptr<hl::master::master_session> session, pb::ChangeMapResult error)
     {
-        out_buffer out_buf(hl::InternalServerMessage_ChangeMapRes);
+        out_buffer out_buf(hl::InternalServerMessage_MigrateRegionRes);
         out_buf.write(_socket_sn);
         out_buf.write(_pid);
         out_buf.write(error);
@@ -32,8 +32,8 @@ private:
     }
 
 public:
-    first_load_player_job(uint32_t master_socket_sn, uint32_t socket_sn, std::string device_id, std::string remote_address,
-                   uint64_t pid)
+    first_load_player_job(socket_sn_t master_socket_sn, socket_sn_t socket_sn, std::string device_id, std::string remote_address,
+                   player_id_t pid)
             : _master_socket_sn(master_socket_sn), _socket_sn(socket_sn), _device_id(std::move(device_id))
             , _remote_address(std::move(remote_address)), _pid(pid)
     {}
@@ -56,8 +56,8 @@ public:
             data.load(_pid, conn);
 
             auto user = std::make_shared<hl::master::user_record>(0, _socket_sn, _pid, _device_id, _remote_address);
-            auto req = std::make_shared<hl::master::change_map_request>(_master_socket_sn, _pid, data.get_map(),
-                                                                        data.get_sp(), true);
+            auto req = std::make_shared<hl::master::migration_region_request>(_master_socket_sn, _pid, data.get_map(),
+                                                                              data.get_sp(), true);
             user->set_player_data(std::move(data));
 
             LOGV << "adding user to hangout (" << user->get_pid() << ")";
@@ -65,7 +65,7 @@ public:
 
             LOGV << "changing user map to " << req->get_scene() << "," << req->get_starting_point() << " ("
                  << user->get_pid() << ")";
-            GAME_WORLD.change_map(req);
+            GAME_WORLD.migrate_region(req);
         }
         catch (const sqlpp::exception &ex)
         {
@@ -80,12 +80,12 @@ public:
     }
 };
 
-void hl::master::handlers::change_map_req::handle_packet(master_session &session, in_buffer &in_buf)
+void hl::master::handlers::migrate_region_req::handle_packet(master_session &session, in_buffer &in_buf)
 {
-    const auto socket_sn = in_buf.read<uint32_t>();
+    const auto socket_sn = in_buf.read<socket_sn_t>();
     const auto device_id = in_buf.read_str();
     const auto remote_address = in_buf.read_str();
-    const auto pid = in_buf.read<uint64_t>();
+    const auto pid = in_buf.read<player_id_t>();
     const auto scene = in_buf.read_str();
     const auto sp = in_buf.read_str();
 
@@ -97,7 +97,7 @@ void hl::master::handlers::change_map_req::handle_packet(master_session &session
     else
     {
         // TODO 게임 서버에서 맵 이동 전, scene, sp 유효성 검사
-        auto req = std::make_shared<hl::master::change_map_request>(session.get_socket_sn(), pid, scene, sp, false);
+        auto req = std::make_shared<hl::master::migration_region_request>(session.get_socket_sn(), pid, scene, sp, false);
         auto user = req->get_user();
 
         // 왜 이거 두개 0으로 해놨었지?...
@@ -107,7 +107,7 @@ void hl::master::handlers::change_map_req::handle_packet(master_session &session
         user->set_player_socket_sn(socket_sn);
         user->set_new_map(scene, sp);
         user->set_state(user_state::migrating);
-        GAME_WORLD.change_map(req);
+        GAME_WORLD.migrate_region(req);
     }
 }
 

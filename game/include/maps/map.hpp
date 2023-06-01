@@ -12,7 +12,7 @@
 #endif
 
 #include "portal.hpp"
-#include "objects/field_object.hpp"
+#include "../objects/field_object.hpp"
 
 namespace hl::game
 {
@@ -21,49 +21,52 @@ namespace hl::game
     class map
     {
     private:
-        const uint32_t _map_sn;
         const std::string _scene;
-        const map_type _type;
+        const region_id_t _region_id;
+        const region_sn_t _region_sn;
 
         std::unordered_map<std::string, std::shared_ptr<portal>> _portals;
         std::vector<std::shared_ptr<portal>> _starting_points;
 
         mutable std::mutex _mutex;
-        std::unordered_map<uint64_t, std::shared_ptr<player>> _players;
+        std::unordered_map<player_id_t, std::shared_ptr<player>> _players;
         std::unordered_map<uint64_t, std::shared_ptr<field_object>> _objects;
 
         friend class map_factory;
 
     public:
-        map(uint32_t map_sn, std::string scene, map_type type);
+        map(std::string scene, region_id_t id, region_sn_t sn);
 
-        uint32_t get_map_sn() const;
-        const std::string &get_scene() const;
-        map_type get_type() const;
+        [[nodiscard]] const std::string &get_scene() const;
+        [[nodiscard]] region_id_t get_region_id() const;
+        [[nodiscard]] region_sn_t get_region_sn() const;
 
         void put_on_portal(const std::shared_ptr<player>& player, std::string& sp);
         void add_player(const std::shared_ptr<player>& player);
-        void remove_player(uint64_t pid);
+        void remove_player(player_id_t pid);
         void on_move_player(const std::shared_ptr<player>& player, in_buffer& in);
         void on_change_map_req(const std::shared_ptr<player>& player, in_buffer& in);
 
     private:
         std::shared_ptr<hl::game::portal> get_portal(const std::string& pt) const;
-        std::shared_ptr<player> find_player(uint64_t pid);
+        std::shared_ptr<player> find_player(player_id_t pid);
 
         std::shared_ptr<field_object> find_object_no_lock(uint64_t object_id) const;
 
         inline auto get_objects() const
         {
-            return _objects | std::views::transform([](const auto& pair){ return pair.second; });
+            return _objects | std::views::values;
         }
 
         inline auto get_players() const
         {
-            return _players | std::views::transform([](const auto& pair){ return pair.second; });
+            return _players | std::views::values;
         }
 
-        void broadcast(const out_buffer& out, uint64_t exception_pid = 0);
+        void broadcast(const out_buffer& out, player_id_t exception_pid = 0);
+
+        void change_map_local(const std::shared_ptr<player>& player, const std::shared_ptr<portal>& pt) const;
+        static void request_migrate_region(const std::shared_ptr<player>& player, const std::shared_ptr<portal>& pt, const std::string& device_id);
     };
 }
 

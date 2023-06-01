@@ -15,7 +15,7 @@
 
 namespace hl::master
 {
-    class change_map_request : public abstract_request
+    class migration_region_request : public abstract_request
     {
     private:
         const std::string _scene;
@@ -23,7 +23,7 @@ namespace hl::master
         const bool _first_enter;
 
     public:
-        change_map_request(uint32_t master_socket_sn, uint64_t pid, std::string scene, std::string sp, bool first_enter);
+        migration_region_request(socket_sn_t master_socket_sn, player_id_t pid, std::string scene, std::string sp, bool first_enter);
 
         [[nodiscard]] inline const auto& get_scene() const { return _scene; }
         [[nodiscard]] inline const auto& get_starting_point() const { return _sp; }
