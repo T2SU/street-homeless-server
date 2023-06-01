@@ -12,10 +12,11 @@ void hl::game::mhandlers::region_management_req::handle_packet(master &session, 
 {
     const auto command = in_buf.read<region_management_type>();
     const auto region_sn = in_buf.read<region_sn_t>();
-    const auto region_id = in_buf.read<region_id_t>();
 
     if (command == region_management_type::create)
     {
+        const auto region_id = in_buf.read<region_id_t>();
+
         REGIONS.create(region_sn, region_id);
         out_buffer obuf(hl::InternalClientMessage_RegionManagementRes);
         obuf.write(region_sn);

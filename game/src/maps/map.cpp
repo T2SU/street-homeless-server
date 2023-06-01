@@ -53,7 +53,7 @@ void hl::game::map::add_player(const std::shared_ptr<player> &player)
     }
 }
 
-void hl::game::map::remove_player(uint64_t pid)
+void hl::game::map::remove_player(player_id_t pid)
 {
     synchronized(_mutex)
     {
@@ -68,6 +68,11 @@ void hl::game::map::remove_player(uint64_t pid)
             }
             _players.erase(pid);
         }
+    }
+    if (REGIONS.get(get_region_sn())->maps().empty())
+    {
+        LOGV << "region " << get_region_sn() << " is empty. deleteing current region...";
+        REGIONS.remove(get_region_sn());
     }
 }
 
@@ -197,14 +202,14 @@ void hl::game::map::change_map_local(const std::shared_ptr<player> &player, cons
         return;
     }
     auto pt_name = pt->get_target_portal_name();
-
     auto previous_map = player->get_map();
-    if (previous_map != nullptr)
-        previous_map->remove_player(player->get_pid());
 
     player->set_map(map);
     map->put_on_portal(player, pt_name);
     map->add_player(player);
+
+    if (previous_map != nullptr)
+        previous_map->remove_player(player->get_pid());
 
     out.write<uint8_t>(1); // success
     out.write(player->get_pid());

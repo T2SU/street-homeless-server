@@ -21,7 +21,7 @@ namespace hl::game
         const region_id_t _id;
         const region_sn_t _sn;
 
-        std::mutex _mutex;
+        mutable std::mutex _mutex;
         std::unordered_map<std::string, std::unique_ptr<map>> _maps;
 
     public:
@@ -31,6 +31,7 @@ namespace hl::game
 
         [[nodiscard]] region_id_t get_region_id() const;
         [[nodiscard]] region_sn_t get_region_sn() const;
+        [[nodiscard]] bool empty() const;
 
     private:
         bool create_map(const std::string& scene);

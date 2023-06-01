@@ -83,3 +83,16 @@ region_sn_t hl::game::map_factory::get_region_sn() const
 {
     return _sn;
 }
+
+bool hl::game::map_factory::empty() const
+{
+    synchronized (_mutex)
+    {
+        for (const auto& p : _maps)
+        {
+            if (p.second->size() > 0)
+                return false;
+        }
+    }
+    return true;
+}

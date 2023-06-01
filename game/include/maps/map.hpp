@@ -40,6 +40,7 @@ namespace hl::game
         [[nodiscard]] const std::string &get_scene() const;
         [[nodiscard]] region_id_t get_region_id() const;
         [[nodiscard]] region_sn_t get_region_sn() const;
+        [[nodiscard]] inline auto size() const { synchronized(_mutex) { return _players.size(); } }
 
         void put_on_portal(const std::shared_ptr<player>& player, std::string& sp);
         void add_player(const std::shared_ptr<player>& player);

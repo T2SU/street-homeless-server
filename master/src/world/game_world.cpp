@@ -191,8 +191,21 @@ void hl::master::game_world::remove_region(const std::shared_ptr<region>& region
     LOGV << "[REMOVING] [server: " << region->get_server_idx() << "] region id: " << region->get_region_id() << ", region sn: " << region->get_region_sn() << ", channel id: " << region->get_channel_id();
     _dimensions[region->get_server_idx()].regions.erase(region->get_region_sn());
 
-    auto& channels = _regions[region->get_server_idx()];
+    auto& channels = _regions[region->get_region_id()];
     channels.erase(region->get_channel_id());
+
+    // 이거 마스터에서 리전 삭제를 시도하니까
+    // [마스터->게임]으로 RegionRemove 요청이 간 후에야,
+    // [유저->게임] 연결이 끊기는 이벤트가 도착하기 때문에 게임서버쪽에서 액세스 위반이 일어남.
+    //  ->  따라서, 게임쪽에서 알아서 빈 region을 해제하는게 나을 것 같음.
+
+//    out_buffer obuf(hl::InternalServerMessage_RegionManagementReq);
+//    obuf.write(region_management_type::remove);
+//    obuf.write(region->get_region_sn());
+//
+//    auto session = hl::singleton<hl::master::master_server>::get().get(server_type::game, region->get_server_idx());
+//    if (session)
+//        session->write(obuf);
 }
 
 server_idx_t hl::master::game_world::retrieve_server_for_region(region_type type) const
