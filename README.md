@@ -7,7 +7,7 @@
 - <가난과 노숙>을 위한 전용 서버로 개발
 
 # 빌드
-- 개발은 **MSVC 17.0 (Visual Studio 2022) + vcpkg** 로 했음.
+- 개발은 **MSVC 17.0 (Visual Studio 2022) + vcpkg** 로 했음. 그러나 macOS의 Apple Clang 에서도 컴파일 및 실행이 잘 되었음.
 ## 필요 패키지 목록
 - C++20 compiler (clang, msvc, ...)
 - git
