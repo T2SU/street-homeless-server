@@ -1,6 +1,0 @@
-username: root
-password: fndndnxm
-port: 3306
-database: homeless
-pooling_min: 2
-pooling_max: 16
